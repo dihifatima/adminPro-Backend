@@ -1,0 +1,32 @@
+package com.example.security.entity;
+
+import com.example.security.Authentification.user.User;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+public class Etudiant extends User {
+    private String  niveauEtude;
+    private String filiere;
+    private String etablissementActuel; // Nom de l'établissement actuel
+    private String scanBacPath;
+    private String cinScanPath;
+    private String releveDeNotesScanPath; // Lien vers le relevé de notes (PDF ou Image)
+    // You can keep transient fields to temporarily hold the data
+    @Transient
+    private byte[] scanBac;
+    @Transient
+    private byte[] cinScan;
+    @Transient
+    private byte[] releveDeNotesScan;
+}
