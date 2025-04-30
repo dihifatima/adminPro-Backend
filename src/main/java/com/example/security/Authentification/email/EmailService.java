@@ -116,9 +116,10 @@ public class EmailService {
 
         try {
             mailSender.send(mimeMessage);
-        }catch (MailException e){
+        } catch (MailException e) {
+            System.err.println("Mail sending failed: " + e.getMessage());
+            e.printStackTrace();
             throw new MessagingException("Failed to send email", e);
         }
-
     }
 }

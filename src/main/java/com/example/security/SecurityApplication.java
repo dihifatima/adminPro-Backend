@@ -31,13 +31,7 @@ public class SecurityApplication {
 			}
 		});
 	}
-	@Bean
-	public MultipartConfigElement multipartConfigElement() {
-		MultipartConfigFactory factory = new MultipartConfigFactory();
-		factory.setMaxFileSize(DataSize.ofMegabytes(10)); // حجم الملف الأقصى 10MB
-		factory.setMaxRequestSize(DataSize.ofMegabytes(10)); // حجم الطلب الكلي 10MB
-		return factory.createMultipartConfig();
-	}
+
 	}
 
 

@@ -22,11 +22,5 @@ public class Etudiant extends User {
     private String scanBacPath;
     private String cinScanPath;
     private String releveDeNotesScanPath; // Lien vers le relevé de notes (PDF ou Image)
-    // You can keep transient fields to temporarily hold the data
-    @Transient
-    private byte[] scanBac;
-    @Transient
-    private byte[] cinScan;
-    @Transient
-    private byte[] releveDeNotesScan;
+
 }

@@ -19,28 +19,14 @@ import java.io.IOException;
 public class AuthenticationController {
     private final AuthenticateService authenticateService;
 
-    @PostMapping(path = "/register", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping("/register")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> register(
-            @RequestPart("request") @Valid RegistrationRequest request,
-            @RequestPart(value = "scanBac", required = false) MultipartFile scanBac,
-            @RequestPart(value = "cinScan", required = false) MultipartFile cinScan,
-            @RequestPart(value = "releveDeNotesScan", required = false) MultipartFile releveDeNotesScan
-    ) throws MessagingException, IOException {
-
-        // Vérification des fichiers et leur affectation
-        if (scanBac != null && !scanBac.isEmpty()) {
-            request.setScanBac(scanBac.getBytes());
-        }
-        if (cinScan != null && !cinScan.isEmpty()) {
-            request.setCinScan(cinScan.getBytes());
-        }
-        if (releveDeNotesScan != null && !releveDeNotesScan.isEmpty()) {
-            request.setReleveDeNotesScan(releveDeNotesScan.getBytes());
-        }
-
+            @RequestBody @Valid RegistrationRequest request
+    ) throws MessagingException {
         return authenticateService.register(request);
     }
+
 
 
     @DeleteMapping("/")
