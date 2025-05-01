@@ -8,10 +8,10 @@ import com.example.security.Authentification.user.Token;
 import com.example.security.Authentification.user.TokenRepository;
 import com.example.security.Authentification.user.User;
 import com.example.security.Authentification.user.UserRepository;
-import com.example.security.entity.Admin;
-import com.example.security.entity.Etudiant;
 import com.example.security.dao.AdminRepository;
 import com.example.security.dao.EtudiantRepository;
+import com.example.security.entity.Admin;
+import com.example.security.entity.Etudiant;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import java.time.LocalDateTime;
 import java.util.HashMap;

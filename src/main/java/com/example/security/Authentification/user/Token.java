@@ -15,6 +15,10 @@ public class Token {
     @Id @GeneratedValue
     private Long id;
     private String token;
+
+    @Enumerated(EnumType.STRING)
+    private ResetTokenType tokenType;// Type de token: ACTIVATION ou PASSWORD_RESET
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createAt;
