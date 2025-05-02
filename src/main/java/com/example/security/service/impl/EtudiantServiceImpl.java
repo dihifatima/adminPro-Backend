@@ -42,6 +42,7 @@ avant de sauvegarder les nouvelles informations.
  La méthode retourne 0 après la mise à jour.
           */
             etudiant.setId(oldEtudiant.getId());
+            etudiant.setPassword(oldEtudiant.getPassword());
             etudiantRepository.save(etudiant);
             return 0;
         }
@@ -79,6 +80,17 @@ La méthode est annotée avec @Transactional, ce qui garantit que l'opération d
     public List<Etudiant> findAll() {
         return etudiantRepository.findAll();
     }
+
+    @Override
+    public Etudiant getEtudiantById(Long id) {
+        return etudiantRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<Etudiant> findByFirstnameORLastname(String firstname, String lastname) {
+        return etudiantRepository.findByFirstnameORLastname(firstname,lastname);
+    }
+
 
 }
 

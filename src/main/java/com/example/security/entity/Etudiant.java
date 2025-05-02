@@ -19,8 +19,9 @@ public class Etudiant extends User {
     private String  niveauEtude;
     private String filiere;
     private String etablissementActuel; // Nom de l'établissement actuel
-    private String scanBacPath;
-    private String cinScanPath;
+    private String scanBacPath;           // Ex: "uploads/scan_bac.pdf"
+    private String cinScanPath;           // Ex: "uploads/cin_scan.jpg"
+    private String photos;                // Ex: "uploads/photo.jpg"
     private String releveDeNotesScanPath; // Lien vers le relevé de notes (PDF ou Image)
 
 }

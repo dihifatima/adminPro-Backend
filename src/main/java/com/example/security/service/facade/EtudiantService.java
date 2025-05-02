@@ -21,5 +21,9 @@ public interface EtudiantService {
     int update(Etudiant etudiant);
     Etudiant findByEmail(String email);
     int deleteById(Long id);
-    List<Etudiant> findAll();
+    List<Etudiant> findAll();//Récupérer tous les étudiants.
+    Etudiant getEtudiantById(Long id); //Récupérer un étudiant par ID.
+
+    List<Etudiant> findByFirstnameORLastname(String firstname, String lastname);
+
 }
