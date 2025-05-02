@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EtudiantDto {
     // Champs hérités de User
+    private Long id;
     private String firstname;
     private String lastname;
     private String email;
@@ -21,4 +22,5 @@ public class EtudiantDto {
     private String cinScanPath;
     private String photos;
     private String releveDeNotesScanPath;
+
 }

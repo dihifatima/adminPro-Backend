@@ -3,6 +3,7 @@ package com.example.security.service.impl;
 import com.example.security.dao.EtudiantRepository;
 import com.example.security.entity.Etudiant;
 import com.example.security.service.facade.EtudiantService;
+import com.example.security.ws.dto.EtudiantDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,24 +30,25 @@ public class EtudiantServiceImpl implements EtudiantService {
 
     @Override
     public int update(Etudiant etudiant) {
-        Etudiant oldEtudiant = findByEmail(etudiant.getEmail());
-        if (oldEtudiant == null) {
-            return -1;
-        } else {
-       /*
--Cette méthode permet de mettre à jour les informations d'un étudiant.
--Elle vérifie d'abord si l'étudiant existe dans la base de données avec findByEmail.
-Si l'étudiant n'existe pas, elle retourne -1.
-Si l'étudiant existe, l'ID de l'étudiant est mis à jour avec l'ID de l'ancien étudiant
-avant de sauvegarder les nouvelles informations.
- La méthode retourne 0 après la mise à jour.
-          */
-            etudiant.setId(oldEtudiant.getId());
-            etudiant.setPassword(oldEtudiant.getPassword());
-            etudiantRepository.save(etudiant);
-            return 0;
-        }
+        Etudiant existing = findByEmail(etudiant.getEmail());
+        if (existing == null) return -1;
+
+        // Mise à jour uniquement des champs non nuls
+        if (etudiant.getFirstname() != null) existing.setFirstname(etudiant.getFirstname());
+        if (etudiant.getLastname() != null) existing.setLastname(etudiant.getLastname());
+        if (etudiant.getNiveauEtude() != null) existing.setNiveauEtude(etudiant.getNiveauEtude());
+        if (etudiant.getFiliere() != null) existing.setFiliere(etudiant.getFiliere());
+        if (etudiant.getEtablissementActuel() != null) existing.setEtablissementActuel(etudiant.getEtablissementActuel());
+        if (etudiant.getScanBacPath() != null) existing.setScanBacPath(etudiant.getScanBacPath());
+        if (etudiant.getCinScanPath() != null) existing.setCinScanPath(etudiant.getCinScanPath());
+        if (etudiant.getPhotos() != null) existing.setPhotos(etudiant.getPhotos());
+        if (etudiant.getReleveDeNotesScanPath() != null) existing.setReleveDeNotesScanPath(etudiant.getReleveDeNotesScanPath());
+
+        etudiantRepository.save(existing);
+        return 0;
     }
+
+
 
     @Override
     public Etudiant findByEmail(String email) {
@@ -87,9 +89,11 @@ La méthode est annotée avec @Transactional, ce qui garantit que l'opération d
     }
 
     @Override
-    public List<Etudiant> findByFirstnameORLastname(String firstname, String lastname) {
-        return etudiantRepository.findByFirstnameORLastname(firstname,lastname);
+    public List<Etudiant> findByFirstnameOrLastname(String firstname, String lastname) {
+        return etudiantRepository.findByFirstnameOrLastname(firstname, lastname);
     }
+
+
 
 
 }

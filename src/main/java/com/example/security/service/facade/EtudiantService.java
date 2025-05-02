@@ -24,6 +24,6 @@ public interface EtudiantService {
     List<Etudiant> findAll();//Récupérer tous les étudiants.
     Etudiant getEtudiantById(Long id); //Récupérer un étudiant par ID.
 
-    List<Etudiant> findByFirstnameORLastname(String firstname, String lastname);
 
+    List<Etudiant> findByFirstnameOrLastname(String firstname, String lastname);
 }
