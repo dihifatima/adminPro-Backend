@@ -19,11 +19,11 @@ public class EtudiantController {
     @Autowired
     private EtudiantConverter converter;
 
-    @PostMapping("")
+   /* @PostMapping("")
     public int save(@RequestBody EtudiantDto dto) {
         Etudiant etudiant = converter.map(dto);
         return service.save(etudiant);
-    }
+    }*/
 
     @PutMapping("")
     public int update(@RequestBody EtudiantDto dto) {

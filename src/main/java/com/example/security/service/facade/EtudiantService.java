@@ -5,7 +5,7 @@ import com.example.security.entity.Etudiant;
 import java.util.List;
 
 public interface EtudiantService {
-    int save(Etudiant etudiant);
+    //int save(Etudiant etudiant);
     /*
      le type de routeur est un int pour : pour indiquer un code de résultat
 

@@ -18,7 +18,7 @@ public class EtudiantServiceImpl implements EtudiantService {
         this.etudiantRepository = etudiantRepository;
     }
 
-    @Override
+   /* @Override
     public int save(Etudiant etudiant) {
         if (findByEmail(etudiant.getEmail()) != null) {
             return -1; // étudiant existe déjà
@@ -26,7 +26,7 @@ public class EtudiantServiceImpl implements EtudiantService {
             etudiantRepository.save(etudiant);
             return 1; // succès
         }
-    }
+    }*/
 
     @Override
     public int update(Etudiant etudiant) {
