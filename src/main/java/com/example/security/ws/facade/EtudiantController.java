@@ -55,14 +55,14 @@ public class EtudiantController {
     }
 
     @GetMapping("/id/{id}")
-    public EtudiantDto getEtudiantById(@PathVariable Long id) {
+    public ResponseEntity<EtudiantDto> getEtudiantById(@PathVariable Long id) {
         Etudiant etudiant = service.getEtudiantById(id);
         if (etudiant == null) {
-            // Si l'étudiant n'est pas trouvé, retourner une réponse 404
-            return null;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return converter.map(etudiant); // Convertir l'entité Etudiant en DTO pour la réponse
-    }
+        EtudiantDto dto = converter.map(etudiant);
+        return ResponseEntity.ok(dto);
+          }
     @GetMapping("/search")
     public List<EtudiantDto> searchEtudiants(@RequestParam String firstname, @RequestParam String lastname) {
         List<Etudiant> etudiants = service.findByFirstnameOrLastname(firstname, lastname);

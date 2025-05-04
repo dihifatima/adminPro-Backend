@@ -8,10 +8,8 @@ import com.example.security.Authentification.user.Token;
 import com.example.security.Authentification.user.TokenRepository;
 import com.example.security.Authentification.user.User;
 import com.example.security.Authentification.user.UserRepository;
-import com.example.security.dao.AdminRepository;
-import com.example.security.dao.EtudiantRepository;
-import com.example.security.entity.Admin;
-import com.example.security.entity.Etudiant;
+import com.example.security.dao.*;
+import com.example.security.entity.*;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +35,10 @@ public class AuthenticateService {
     private final TokenRepository tokenRepository;
     private final AdminRepository adminRepository;
     private final EtudiantRepository  etudiantRepository;
+    private final PorteVisaRepository porteVisaRepository;
+    private final EntrepreneurRepository entrepreneurRepository;
+    private final AdminSecondaireRepository adminSecondaireRepository;
+    private final ParticulierRepository particulierRepository;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -48,9 +50,11 @@ public class AuthenticateService {
 
         // Vérification du rôle et enregistrement d'un admin ou étudiant
         if (request.isAdmin()) {
+/*Ce if vérifie si l'utilisateur que l'on souhaite enregistrer est un Admin. request.isAdmin() renvoie true si l'utilisateur a choisi le rôle "Admin" lors de l'enregistrement. Si ce n'est pas le cas, la logique continue avec le else if pour vérifier si l'utilisateur est un Etudiant.*/
             userRole= roleRepository.findByName("ADMIN")
-                    .orElseThrow(() -> new IllegalStateException("ROLE ADMIN was not initialized"));
-
+                    .orElseThrow(() -> new IllegalStateException("Le rôle ADMIN est introuvable ou non défini dans la base de données"));
+/*Cette ligne récupère le rôle "ADMIN" dans la base de données via roleRepository. Si le rôle n'est pas trouvé, une exception IllegalStateException est levée avec le message "ROLE ADMIN was not initialized". Cette vérification garantit que le rôle "ADMIN" existe dans la base de données avant de créer un utilisateur admin.*/
+//creation de l 'instance Admin  via le builder pattern
             Admin admin = Admin.builder()
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
@@ -61,11 +65,29 @@ public class AuthenticateService {
                     .enabled(false)
                     .build();
 
-            adminRepository.save(admin);
+            adminRepository.save(admin);//Enregistrement de l'Admin dans la base de données
             emailService.sendValidationEmail(admin); // Envoi du mail de validation pour un admin
-         }else if (request.isEtudiant()) {
+         }else if (request.isAdminSecondaire()) {
+            userRole = roleRepository.findByName("ADMINSECONDAIRE")
+                    .orElseThrow(() -> new IllegalStateException("Le rôle ADMINSECONDAIRE est introuvable ou non défini dans la base de données"));
+
+            AdminSecondaire adminSecondaire = AdminSecondaire.builder()
+                    .email(request.getEmail())
+                    .firstname(request.getFirstname())
+                    .lastname(request.getLastname())
+                    .roles(List.of(userRole))
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .accountLocked(false)
+                    .enabled(false)
+                    .build();
+
+            adminSecondaireRepository.save(adminSecondaire);
+            emailService.sendValidationEmail(adminSecondaire); // Envoi du mail de validation pour un admin secondaire
+        }
+
+        else if (request.isEtudiant()) {
             userRole = roleRepository.findByName("ETUDIANT")
-                    .orElseThrow(() -> new IllegalStateException("ROLE ETUDIANT was not initialized"));
+                    .orElseThrow(() -> new IllegalStateException("Le rôle ETUDIANT est introuvable ou non défini dans la base de données"));
 
             Etudiant etudiant = Etudiant.builder()
                     .email(request.getEmail())
@@ -80,7 +102,61 @@ public class AuthenticateService {
             // Enregistrement de l'étudiant
             etudiantRepository.save(etudiant);
             emailService.sendValidationEmail(etudiant); // Envoi du mail de validation pour un étudiant
-        } else {
+        }
+
+        else if (request.isEntrepreneur()) {
+            userRole = roleRepository.findByName("ENTREPRENEUR")
+                    .orElseThrow(() -> new IllegalStateException("Le rôle ENTREPRENEUR est introuvable ou non défini dans la base de données"));
+
+            Entrepreneur entrepreneur = Entrepreneur.builder()
+                    .email(request.getEmail())
+                    .firstname(request.getFirstname())
+                    .lastname(request.getLastname())
+                    .roles(List.of(userRole))
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .accountLocked(false)
+                    .enabled(false)
+                    .build();
+
+            entrepreneurRepository.save(entrepreneur);
+            emailService.sendValidationEmail(entrepreneur); // Envoi du mail de validation pour un entrepreneur
+        }else if (request.isParticulier()) {
+            userRole = roleRepository.findByName("PARTICULIER")
+                    .orElseThrow(() -> new IllegalStateException("Le rôle PARTICULIER est introuvable ou non défini dans la base de données"));
+
+            Particulier particulier = Particulier.builder()
+                    .email(request.getEmail())
+                    .firstname(request.getFirstname())
+                    .lastname(request.getLastname())
+                    .roles(List.of(userRole))
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .accountLocked(false)
+                    .enabled(false)
+                    .build();
+
+            particulierRepository.save(particulier);
+            emailService.sendValidationEmail(particulier); // Envoi du mail de validation pour un particulier
+        }
+        else if (request.isPorteVisa()) {
+            userRole = roleRepository.findByName("PORTEVISA")
+                    .orElseThrow(() -> new IllegalStateException("Le rôle PORTEVISA est introuvable ou non défini dans la base de données"));
+
+            PorteVisa porteVisa = PorteVisa.builder()
+                    .email(request.getEmail())
+                    .firstname(request.getFirstname())
+                    .lastname(request.getLastname())
+                    .roles(List.of(userRole))
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .accountLocked(false)
+                    .enabled(false)
+                    .build();
+
+            porteVisaRepository.save(porteVisa);
+            emailService.sendValidationEmail(porteVisa); // Envoi du mail de validation pour un porteur de visa
+        }
+
+
+        else {
             throw new IllegalArgumentException("Invalid role selection");
         }
 

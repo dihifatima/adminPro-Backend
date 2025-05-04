@@ -1,6 +1,7 @@
 package com.example.security.entity;
 
 import com.example.security.Authentification.user.User;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
+@DiscriminatorValue("Particulier")
 public class Particulier extends User {
     private String objetDemande;
     private String ville;

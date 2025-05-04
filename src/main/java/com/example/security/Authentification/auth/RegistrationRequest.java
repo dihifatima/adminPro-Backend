@@ -13,24 +13,32 @@ import lombok.Setter;
 public class RegistrationRequest {
 
     private boolean isAdmin;
+    private boolean isAdminSecondaire;
     private boolean isEtudiant;
-    @AssertTrue(message = "C'est soit un admin, soit un étudiant (pas les deux, ni aucun).")
+    private boolean isEntrepreneur;
+    private boolean isParticulier;
+    private boolean isPorteVisa;
+
+    @AssertTrue(message = "C'est soit un admin, soit un étudiant ou un des autre .")
     private boolean isExactlyOneRole() {
-        return isAdmin ^ isEtudiant; // XOR : un seul des deux doit être vrai
+        int count = 0;
+        if (isAdmin) count++;
+        if (isAdminSecondaire) count++;
+        if (isEtudiant) count++;
+        if (isEntrepreneur) count++;
+        if (isParticulier) count++;
+        if (isPorteVisa) count++;
+        return count == 1;
     }
-    @NotEmpty(message = "Firstname is mandatory")
-    @NotNull(message = "Firstname is mandatory")
+    @NotEmpty(message = "Le prénom est obligatoire")
     private String firstname;
-    @NotEmpty(message = "Lastname is mandatory")
-    @NotNull(message = "Lastname is mandatory")
+    @NotEmpty(message = "Le nom de famille est obligatoire")
     private String lastname;
-    @Email(message = "Email is not well formatted")
-    @NotEmpty(message = "Email is mandatory")
-    @NotNull(message = "Email is mandatory")
+    @Email(message = "L'email n'est pas bien formaté")
+    @NotEmpty(message = "L'email est obligatoire")
     private String email;
-    @NotEmpty(message = "Password is mandatory")
-    @NotNull(message = "Password is mandatory")
-    @Size(min = 8, message = "Password should be 8 characters long minimum")
+    @NotEmpty(message = "Le mot de passe est obligatoire")
+    @Size(min = 8, message = "Le mot de passe doit comporter au moins 8 caractères")
     private String password;
 
 

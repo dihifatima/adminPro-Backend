@@ -26,9 +26,22 @@ public class SecurityApplication {
 			if(roleRepository.findByName("ADMIN").isEmpty()){
 				roleRepository.save(Role.builder().name("ADMIN").build());
 			}
+			if(roleRepository.findByName("ADMIN_SECONDAIRE").isEmpty()){
+				roleRepository.save(Role.builder().name("ADMIN_SECONDAIRE").build());
+			}
 			if(roleRepository.findByName("ETUDIANT").isEmpty()){
 				roleRepository.save(Role.builder().name("ETUDIANT").build());
 			}
+			if(roleRepository.findByName("PARTICULIER").isEmpty()){
+				roleRepository.save(Role.builder().name("PARTICULIER").build());
+			}
+			if(roleRepository.findByName("ENTREPRENEUR").isEmpty()){
+				roleRepository.save(Role.builder().name("ENTREPRENEUR").build());
+			}
+			if(roleRepository.findByName("PORTE_VISA").isEmpty()){
+				roleRepository.save(Role.builder().name("PORTE_VISA").build());
+			}
+
 		});
 	}
 

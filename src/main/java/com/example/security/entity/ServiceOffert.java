@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Service {
+public class ServiceOffert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idService;
     private String nom;
     private String description;
     @Enumerated(EnumType.STRING)
-    private EtatDemande type;
-    private String lienFormulaire;
+    private TypeService type;
     private boolean estDisponible;
 }

@@ -30,7 +30,6 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
     private final TokenRepository tokenRepository;
     private final UserRepository userRepository;
-    @Value("${application.mailing.frontend.activation-url}")
     private String activationUrl;
 
     @Transactional
@@ -106,7 +105,7 @@ public class EmailService {
         Context context = new Context();
         context.setVariables(proprites);
 
-        helper.setFrom("ikramlin18@gmail.com");
+        helper.setFrom("fatifaty715@gmail.com");
         helper.addTo(to);
         helper.setSubject(subject);
 

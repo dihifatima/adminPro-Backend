@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service;
 @Setter
 @Builder
 public class AuthenticateRequest {
-    @Email(message = "Email is not well formatted")
-    @NotEmpty(message = "Email is mandatory")
-    @NotNull(message = "Email is mandatory")
+    @Email(message = "L'email n'est pas bien formaté")
+    @NotEmpty(message = "L'email est obligatoire")
+    @NotNull(message = "L'email est obligatoire")
     private String email;
-    @NotEmpty(message = "Password is mandatory")
-    @NotNull(message = "Password is mandatory")
-    @Size(min = 8, message = "Password should be 8 characters long minimum")
+    @NotEmpty(message = "Le mot de passe est obligatoire")
+    @NotNull(message = "Le mot de passe est obligatoire")
+    @Size(min = 8, message = "Le mot de passe doit comporter au moins 8 caractères")
     private String password;
 }

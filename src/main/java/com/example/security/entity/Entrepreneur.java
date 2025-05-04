@@ -1,6 +1,7 @@
 package com.example.security.entity;
 
 import com.example.security.Authentification.user.User;
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
+@DiscriminatorValue("Entrepreneur")// si tu utilises l'héritage
+
 public class Entrepreneur extends User {
     private String nomEntreprise;
     private String secteurActivite;
