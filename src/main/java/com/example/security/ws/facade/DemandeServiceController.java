@@ -28,26 +28,17 @@ public class DemandeServiceController {
     public ResponseEntity<DemandeServiceDto> createDemandeService(
             @RequestBody DemandeServiceDto demandeServiceDto) {
 
-        // Convertir le DTO en entité
+
         DemandeService demandeService = demandeServiceConverter.map(demandeServiceDto);
 
-        // Extraire les informations supplémentaires
-        Long serviceOffertId = demandeServiceDto.getServiceOffertId();
-        Long userId = demandeServiceDto.getUserId();
-        String userNom = demandeServiceDto.getUserNom();
-        String serviceOffertNom = demandeServiceDto.getServiceOffertNom();
-        LocalDateTime dateRendezvous = demandeServiceDto.getDateRendezvous();
-        String statut = demandeServiceDto.getStatut();
+
+
 
         // Sauvegarder la demande
         DemandeService savedDemandeService = demandeServiceService.save(
                 demandeService,
-                serviceOffertId,
-                userId,
-                userNom,
-                serviceOffertNom,
-                dateRendezvous,
-                statut
+                demandeServiceDto.getServiceOffertId(),
+                demandeServiceDto.getUserId()
         );
 
         if (savedDemandeService != null) {

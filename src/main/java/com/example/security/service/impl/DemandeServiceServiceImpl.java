@@ -38,28 +38,32 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
 
 
     @Override
-    public DemandeService save(DemandeService demandeService, Long serviceOffertId, Long userId, String userNom, String serviceOffertNom, LocalDateTime dateRendezvous, String statut) {
-        // Vérifier si l'utilisateur existe
-        Optional<User> userOpt = userRepository.findById(userId);
+    public DemandeService save(DemandeService demandeService,Long serviceOffertId, Long userId ) {
 
-        // Vérifier si le service offert existe
+        LocalDateTime dateRendezvous = demandeService.getDateRendezvous();
+        String statut = demandeService.getStatut();
+
+        Optional<User> userOpt = userRepository.findById(userId);
+        String userNom = userOpt.get().getFullName();
+
         Optional<ServiceOffert> serviceOffertOpt = serviceOffertRepository.findById(serviceOffertId);
+        String serviceOffertNom = serviceOffertOpt.get().getName();
 
         if (userOpt.isEmpty() || serviceOffertOpt.isEmpty()) {
-            // Si l'utilisateur ou le service offert n'existe pas, retour d'une erreur ou null
             return null;
         }
 
-        // Associer l'utilisateur et le service offert à la demande
+
         demandeService.setUser(userOpt.get());
         demandeService.setServiceOffert(serviceOffertOpt.get());
+        demandeService.setUserNom(userNom);
+        demandeService.setServiceOffertNom(serviceOffertNom);
 
-        // Appliquer les autres attributs (userNom, serviceOffertNom, etc.)
-        demandeService.setDateSoumission(LocalDateTime.now()); // On suppose que la date de soumission est l'heure actuelle
+
+        demandeService.setDateSoumission(LocalDateTime.now());
         demandeService.setDateRendezvous(dateRendezvous);
         demandeService.setStatut(statut);
 
-        // Sauvegarder la demande de service
         return demandeServiceRepository.save(demandeService);
     }
 
