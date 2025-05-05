@@ -1,58 +1,101 @@
 package com.example.security.ws.facade;
 
 import com.example.security.entity.DemandeService;
-import com.example.security.entity.EtatDemande;
 import com.example.security.service.facade.DemandeServiceService;
 import com.example.security.ws.converter.DemandeServiceConverter;
 import com.example.security.ws.dto.DemandeServiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/demandes")
 @CrossOrigin(origins = "http://localhost:4200")
 public class DemandeServiceController {
-
     @Autowired
-    private  DemandeServiceService demandeServiceService;
+    private DemandeServiceService demandeServiceService;
+
     @Autowired
     private DemandeServiceConverter demandeServiceConverter;
 
-    // ✅ utilise 'create' au lieu de 'save'
-    @PostMapping("/")
-    public ResponseEntity<DemandeServiceDto> create(@RequestBody DemandeServiceDto demandeDto) {
-        DemandeService demande = demandeServiceConverter.map(demandeDto);
-        DemandeService savedDemande = demandeServiceService.create(demande);
-        return ResponseEntity.ok(demandeServiceConverter.map(savedDemande));
+    // Créer une nouvelle demande de service
+    @PostMapping
+    public ResponseEntity<DemandeServiceDto> createDemandeService(
+            @RequestBody DemandeServiceDto demandeServiceDto) {
+
+        // Convertir le DTO en entité
+        DemandeService demandeService = demandeServiceConverter.map(demandeServiceDto);
+
+        // Sauvegarder la demande de service avec les IDs passés dans le DTO
+        DemandeService savedDemandeService = demandeServiceService.save(
+                demandeService,
+                demandeServiceDto.getServiceOffertId(),
+                demandeServiceDto.getUserId()
+        );
+
+        if (savedDemandeService != null) {
+            // Si la demande a été sauvegardée avec succès
+            return new ResponseEntity<>(demandeServiceConverter.map(savedDemandeService), HttpStatus.CREATED);
+        } else {
+            // Si un des éléments est invalide (utilisateur ou service offert non trouvé)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
-    // ✅ met à jour uniquement l'état (conforme à updateStatus)
+
+    // Récupérer une demande de service par son ID
+    @GetMapping("/{id}")
+    public ResponseEntity<DemandeServiceDto> getDemandeServiceById(@PathVariable Long id) {
+        Optional<DemandeService> demandeServiceOpt = demandeServiceService.findById(id);
+        if (demandeServiceOpt.isPresent()) {
+            return new ResponseEntity<>(demandeServiceConverter.map(demandeServiceOpt.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Récupérer toutes les demandes de services
+    @GetMapping
+    public ResponseEntity<List<DemandeServiceDto>> getAllDemandesService() {
+        List<DemandeService> demandesServices = demandeServiceService.findAll();
+        return new ResponseEntity<>(demandeServiceConverter.mapListEntities(demandesServices), HttpStatus.OK);
+    }
+
+    // Mettre à jour le statut d'une demande de service
     @PutMapping("/{id}")
-    public ResponseEntity<DemandeServiceDto> updateStatus(@PathVariable Long id, @RequestBody DemandeServiceDto demandeDto) {
-        EtatDemande etat = EtatDemande.valueOf(demandeDto.getEtat());
-        DemandeService updatedDemande = demandeServiceService.updateStatus(id, etat);
-        return ResponseEntity.ok(demandeServiceConverter.map(updatedDemande));
+    public ResponseEntity<DemandeServiceDto> updateStatut(
+            @PathVariable Long id,
+            @RequestParam String nouveauStatut) {
+        DemandeService updatedDemandeService = demandeServiceService.updateStatut(id, nouveauStatut);
+        if (updatedDemandeService != null) {
+            return new ResponseEntity<>(demandeServiceConverter.map(updatedDemandeService), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<DemandeServiceDto>> findAll() {
-        List<DemandeService> demandes = demandeServiceService.findAll();
-        return ResponseEntity.ok(demandeServiceConverter.mapListEntities(demandes));
+    // Supprimer une demande de service
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDemandeService(@PathVariable Long id) {
+        demandeServiceService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/id/{id}")
-    public ResponseEntity<DemandeServiceDto> findById(@PathVariable Long id) {
-        DemandeService demande = demandeServiceService.findById(id);
-        return ResponseEntity.ok(demandeServiceConverter.map(demande));
+    // Récupérer les demandes de service par utilisateur
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<DemandeServiceDto>> getDemandesByUser(@PathVariable Long userId) {
+        List<DemandeService> demandesServices = demandeServiceService.findByUserId(userId);
+        return new ResponseEntity<>(demandeServiceConverter.mapListEntities(demandesServices), HttpStatus.OK);
     }
 
-    // ✅ utilise 'delete' au lieu de 'deleteById'
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        demandeServiceService.delete(id);
-        return ResponseEntity.noContent().build();
+    // Récupérer les demandes de service par service offert
+    @GetMapping("/service/{serviceOffertId}")
+    public ResponseEntity<List<DemandeServiceDto>> getDemandesByServiceOffert(@PathVariable Long serviceOffertId) {
+        List<DemandeService> demandesServices = demandeServiceService.findByServiceOffertId(serviceOffertId);
+        return new ResponseEntity<>(demandeServiceConverter.mapListEntities(demandesServices), HttpStatus.OK);
     }
 }

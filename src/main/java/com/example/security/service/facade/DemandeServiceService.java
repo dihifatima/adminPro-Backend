@@ -1,43 +1,29 @@
 package com.example.security.service.facade;
 
-import com.example.security.Authentification.user.User;
+
 import com.example.security.entity.DemandeService;
-import com.example.security.entity.EtatDemande;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
-public interface DemandeServiceService {
-    // Créer une nouvelle demande de service
-    DemandeService create(DemandeService demandeService);
+public interface DemandeServiceService  {
+    // Sauvegarder une nouvelle demande de service avec serviceOffert et user associés
+    DemandeService save(DemandeService demandeService, Long serviceOffertId, Long userId);
 
-    // Mettre à jour l'état d'une demande
-    DemandeService updateStatus(Long idDemande, EtatDemande nouvelEtat);
+    // Trouver une demande de service par son ID
+    Optional<DemandeService> findById(Long id);
 
-    // Planifier un RDV pour une demande
-    DemandeService planifierRDV(Long idDemande, LocalDateTime dateRDV);
-
-    // Rechercher une demande par ID
-    DemandeService findById(Long id);
-
-    // Récupérer toutes les demandes
+    // Récupérer toutes les demandes de service
     List<DemandeService> findAll();
+    // Mettre à jour le statut d'une demande de service
+    DemandeService updateStatut(Long id, String nouveauStatut);
 
-    // Récupérer les demandes d'un utilisateur
-    List<DemandeService> findByUser(User user);
+    // Supprimer une demande de service par son ID
+    void deleteById(Long id);
 
-    // Récupérer les demandes par état
-    List<DemandeService> findByEtat(EtatDemande etat);
+    // Récupérer les demandes de service par utilisateur
+    List<DemandeService> findByUserId(Long userId);
 
-    // Récupérer les demandes entre deux dates
-    List<DemandeService> findByDateSoumissionBetween(LocalDateTime debut, LocalDateTime fin);
-
-    // Récupérer les demandes récentes
-    List<DemandeService> findRecentDemandes();
-
-    // Supprimer une demande
-    int delete(Long id);
-
-    // Statistiques
-    Long countByEtat(EtatDemande etat);
+    // Récupérer les demandes de service par service offert
+    List<DemandeService> findByServiceOffertId(Long serviceOffertId);
 }

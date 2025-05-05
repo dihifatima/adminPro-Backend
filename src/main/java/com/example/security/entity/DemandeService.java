@@ -3,42 +3,50 @@ package com.example.security.entity;
 import com.example.security.Authentification.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 
 import java.time.LocalDateTime;
+
+
+
+@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "Demendes_Services")
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
+@EntityListeners(AuditingEntityListener.class)
 public class DemandeService {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idDemande;
+    private Long id;
 
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime dateSoumission;
 
+    @LastModifiedDate
+    private LocalDateTime dateRendezvous;
+
+    // ✅ Un utilisateur fait plusieurs demandes
     @ManyToOne
-    @JoinColumn(
-            name = "user_id",nullable = false
-    )
-    private User  client;
+    @JoinColumn(name = "user_id")
+    private User user;
 
+    // ✅ Une demande est liée à un seul service
     @ManyToOne
-    @JoinColumn(
-            name = "service_id",nullable = false
-    )
+    @JoinColumn(name = "service_offert_id")
+    private ServiceOffert serviceOffert;
 
-    private ServiceOffert serviceOffert ;
-
-    @Enumerated(EnumType.STRING)
-    private EtatDemande etat = EtatDemande.EN_ATTENTE;
-
-    @PrePersist
-    protected void onCreate() {
-        this.dateSoumission = LocalDateTime.now();
-    }
-    private LocalDateTime dateSoumission ;
-//Chaque fois que tu vas créer une nouvelle DemandeService, la date de soumission (dateSoumission) sera automatiquement remplie avec la date et l'heure actuelles sans que tu aies besoin de la définir manuellement dans le code ou dans une requête HTTP.
-    private LocalDateTime dateRDV;
+    // ✅ Statut : en attente, traité...
+    private String statut; // Ex : "EN_ATTENTE", "TRAITÉ"
 }

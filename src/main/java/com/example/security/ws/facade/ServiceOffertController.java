@@ -1,7 +1,6 @@
 package com.example.security.ws.facade;
 
 import com.example.security.entity.ServiceOffert;
-import com.example.security.entity.TypeService;
 import com.example.security.service.facade.ServiceOffertService;
 import com.example.security.ws.converter.ServiceOffertConverter;
 import com.example.security.ws.dto.ServiceOffertDto;
@@ -11,94 +10,54 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/services")
 public class ServiceOffertController {
 
-    private final ServiceOffertService serviceOffertService;
-    private final ServiceOffertConverter serviceConverter;
 
     @Autowired
-    public ServiceOffertController(ServiceOffertService serviceService, ServiceOffertConverter serviceConverter) {
-        this.serviceOffertService = serviceService;
-        this.serviceConverter = serviceConverter;
+    private ServiceOffertService serviceOffertService;
+
+    @Autowired
+    private ServiceOffertConverter serviceOffertConverter;
+
+    // Créer un nouveau service offert
+    @PostMapping
+    public ResponseEntity<ServiceOffertDto> createServiceOffert(@RequestBody ServiceOffertDto serviceOffertDto) {
+        ServiceOffert serviceOffert = serviceOffertConverter.map(serviceOffertDto);
+        ServiceOffert savedServiceOffert = serviceOffertService.save(serviceOffert);
+        return new ResponseEntity<>(serviceOffertConverter.map(savedServiceOffert), HttpStatus.CREATED);
     }
 
-    @PostMapping("")
-    public ResponseEntity<ServiceOffertDto> create(@RequestBody ServiceOffertDto serviceDto) {
-        ServiceOffert service = serviceConverter.map(serviceDto);
-        ServiceOffert savedService = serviceOffertService.save(service);
-        return new ResponseEntity<>(serviceConverter.map(savedService), HttpStatus.CREATED);
-    }
-
-    @PutMapping("")
-    public ResponseEntity<ServiceOffertDto> update(@RequestBody ServiceOffertDto serviceDto) {
-        ServiceOffert service = serviceConverter.map(serviceDto);
-        ServiceOffert updatedService = serviceOffertService.update(service);
-        if (updatedService == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(serviceConverter.map(updatedService)); // <-- تصحيح هنا
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        int result = serviceOffertService.delete(id);
-        if (result < 0) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<ServiceOffertDto> findById(@PathVariable Long id) {
-        ServiceOffert service = serviceOffertService.findById(id);
-        if (service == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(serviceConverter.map(service));
-    }
-
-    @GetMapping("")
-    public ResponseEntity<List<ServiceOffertDto>> findAll() {
-        List<ServiceOffert> services = serviceOffertService.findAll();
-        return ResponseEntity.ok(serviceConverter.mapListEntities(services));
-    }
-
-    @GetMapping("/disponibles")
-    public ResponseEntity<List<ServiceOffertDto>> findDisponibles() {
-        List<ServiceOffert> services = serviceOffertService.findByEstDisponible(true);
-        return ResponseEntity.ok(serviceConverter.mapListEntities(services));
-    }
-
-    @GetMapping("/type/{type}")
-    public ResponseEntity<List<ServiceOffertDto>> findByType(@PathVariable String type) {
-        try {
-            TypeService typeService = TypeService.valueOf(type);
-            List<ServiceOffert> services = serviceOffertService.findByType(typeService);
-            return ResponseEntity.ok(serviceConverter.mapListEntities(services));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+    // Mettre à jour les détails d'un service offert
+    @PutMapping("/{id}")
+    public ResponseEntity<ServiceOffertDto> updateServiceOffert(@PathVariable Long id, @RequestBody ServiceOffertDto serviceOffertDto) {
+        ServiceOffert serviceOffert = serviceOffertConverter.map(serviceOffertDto);
+        ServiceOffert updatedServiceOffert = serviceOffertService.updateServiceDetails(id, serviceOffert.getName());
+        if (updatedServiceOffert != null) {
+            return new ResponseEntity<>(serviceOffertConverter.map(updatedServiceOffert), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/recherche")
-    public ResponseEntity<List<ServiceOffertDto>> rechercherServices(@RequestParam String nom) {
-        List<ServiceOffert> services = serviceOffertService.findByNomContainingIgnoreCase(nom);
-        return ResponseEntity.ok(serviceConverter.mapListEntities(services));
+    // Obtenir tous les services offerts
+    @GetMapping
+    public ResponseEntity<List<ServiceOffertDto>> getAllServiceOfferts() {
+        List<ServiceOffert> serviceOfferts = serviceOffertService.findAll();
+        return new ResponseEntity<>(serviceOffertConverter.mapListEntities(serviceOfferts), HttpStatus.OK);
     }
 
-
-
-    @GetMapping("/type/{type}/disponibles")
-    public ResponseEntity<List<ServiceOffertDto>> findServicesDiponiblesByType(@PathVariable String type) {
-        try {
-            TypeService typeService = TypeService.valueOf(type);
-            List<ServiceOffert> services = serviceOffertService.findByTypeAndEstDisponibleTrue(typeService);
-            return ResponseEntity.ok(serviceConverter.mapListEntities(services));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
+    // Obtenir un service offert par son nom
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ServiceOffertDto> getServiceOffertByName(@PathVariable String name) {
+        Optional<ServiceOffert> serviceOffertOpt = serviceOffertService.findByName(name);
+        if (serviceOffertOpt.isPresent()) {
+            return new ResponseEntity<>(serviceOffertConverter.map(serviceOffertOpt.get()), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

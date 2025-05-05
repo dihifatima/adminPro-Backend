@@ -1,6 +1,7 @@
 package com.example.security.Authentification.user;
 
 import com.example.security.Authentification.role.Role;
+import com.example.security.entity.DemandeService;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -68,6 +69,8 @@ public class User implements UserDetails, Principal {
     @OneToMany
     private List<Token> tokens;
 
+    @OneToMany(mappedBy = "user")
+    private List<DemandeService> demandes;
 
 
     @Override

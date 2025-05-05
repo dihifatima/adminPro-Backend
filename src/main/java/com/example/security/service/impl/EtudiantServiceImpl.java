@@ -4,16 +4,15 @@ import com.example.security.dao.EtudiantRepository;
 import com.example.security.entity.Etudiant;
 import com.example.security.service.facade.EtudiantService;
 import com.example.security.ws.dto.EtudiantDto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
-
 public class EtudiantServiceImpl implements EtudiantService {
+    @Autowired
     private final EtudiantRepository etudiantRepository;
-
-
     public EtudiantServiceImpl(EtudiantRepository etudiantRepository) {
         this.etudiantRepository = etudiantRepository;
     }
