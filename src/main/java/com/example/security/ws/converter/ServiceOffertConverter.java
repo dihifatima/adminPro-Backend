@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class ServiceOffertConverter {
+    // ترسل كل البيانات إلى الإداري:
+   //map(entity)	ينسخ كل شيء من الكيان إلى الـ DTO (للعرض فقط).
     public ServiceOffertDto map(ServiceOffert entity) {
         ServiceOffertDto dto = new ServiceOffertDto();
         if (entity != null) {
@@ -21,10 +23,10 @@ public class ServiceOffertConverter {
     }
 
     public ServiceOffert map(ServiceOffertDto dto) {
+        if (dto == null) return null;
         ServiceOffert entity = new ServiceOffert();
-        if (dto != null) {
-            BeanUtils.copyProperties(dto, entity);
-        }
+        entity.setName(dto.getName());
+        // On ne copie pas id, createdAt, lastModifiedAt car ils sont gérés par JPA
         return entity;
     }
 

@@ -10,9 +10,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DemandeServiceDto {
     private Long id;
+    private Long userId;
+    private String userNom;
+    private Long ServiceOffertId;
+    private String serviceOffertNom;
     private LocalDateTime dateSoumission;
     private LocalDateTime dateRendezvous;
     private String statut;
-    private Long userId;
-    private Long serviceOffertId;
 }

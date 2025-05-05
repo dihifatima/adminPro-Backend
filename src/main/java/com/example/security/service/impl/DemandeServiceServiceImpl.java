@@ -11,20 +11,20 @@ import com.example.security.entity.DemandeService;
 import com.example.security.entity.ServiceOffert;
 import com.example.security.service.facade.DemandeServiceService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 
 @Service
 public class DemandeServiceServiceImpl implements DemandeServiceService {
-    @Autowired
+
     private final DemandeServiceRepository demandeServiceRepository;
-    @Autowired
+
     private final UserRepository userRepository;
-    @Autowired
+
     private final ServiceOffertRepository serviceOffertRepository;
 
 
@@ -38,8 +38,11 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
 
 
     @Override
-    public DemandeService save(DemandeService demandeService, Long serviceOffertId, Long userId) {
+    public DemandeService save(DemandeService demandeService, Long serviceOffertId, Long userId, String userNom, String serviceOffertNom, LocalDateTime dateRendezvous, String statut) {
+        // Vérifier si l'utilisateur existe
         Optional<User> userOpt = userRepository.findById(userId);
+
+        // Vérifier si le service offert existe
         Optional<ServiceOffert> serviceOffertOpt = serviceOffertRepository.findById(serviceOffertId);
 
         if (userOpt.isEmpty() || serviceOffertOpt.isEmpty()) {
@@ -51,9 +54,15 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
         demandeService.setUser(userOpt.get());
         demandeService.setServiceOffert(serviceOffertOpt.get());
 
+        // Appliquer les autres attributs (userNom, serviceOffertNom, etc.)
+        demandeService.setDateSoumission(LocalDateTime.now()); // On suppose que la date de soumission est l'heure actuelle
+        demandeService.setDateRendezvous(dateRendezvous);
+        demandeService.setStatut(statut);
+
         // Sauvegarder la demande de service
         return demandeServiceRepository.save(demandeService);
     }
+
 
 
     @Override

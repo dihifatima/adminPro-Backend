@@ -13,10 +13,16 @@ public class DemandeServiceConverter {
         DemandeServiceDto dto = new DemandeServiceDto();
         if (entity != null) {
             BeanUtils.copyProperties(entity, dto);
-            if (entity.getUser() != null)
+
+            if (entity.getUser() != null) {
                 dto.setUserId(entity.getUser().getId());
-            if (entity.getServiceOffert() != null)
+                dto.setUserNom(entity.getUser().getFullName()); // ✅ nom complet de l'utilisateur
+            }
+
+            if (entity.getServiceOffert() != null) {
                 dto.setServiceOffertId(entity.getServiceOffert().getId());
+                dto.setServiceOffertNom(entity.getServiceOffert().getName()); // ✅ nom du service
+            }
         }
         return dto;
     }
@@ -25,7 +31,7 @@ public class DemandeServiceConverter {
         DemandeService entity = new DemandeService();
         if (dto != null) {
             BeanUtils.copyProperties(dto, entity);
-            // Associations (user, serviceOffert) will be set in the service layer
+            // user & serviceOffert are set in the service layer
         }
         return entity;
     }

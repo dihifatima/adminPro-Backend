@@ -3,12 +3,14 @@ package com.example.security.service.facade;
 
 import com.example.security.entity.DemandeService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface DemandeServiceService  {
     // Sauvegarder une nouvelle demande de service avec serviceOffert et user associés
-    DemandeService save(DemandeService demandeService, Long serviceOffertId, Long userId);
+
+    DemandeService save(DemandeService demandeService, Long serviceOffertId, Long userId, String userNom, String serviceOffertNom, LocalDateTime dateRendezvous, String statut);
 
     // Trouver une demande de service par son ID
     Optional<DemandeService> findById(Long id);

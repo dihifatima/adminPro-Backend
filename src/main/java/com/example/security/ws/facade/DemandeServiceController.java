@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,18 +31,28 @@ public class DemandeServiceController {
         // Convertir le DTO en entité
         DemandeService demandeService = demandeServiceConverter.map(demandeServiceDto);
 
-        // Sauvegarder la demande de service avec les IDs passés dans le DTO
+        // Extraire les informations supplémentaires
+        Long serviceOffertId = demandeServiceDto.getServiceOffertId();
+        Long userId = demandeServiceDto.getUserId();
+        String userNom = demandeServiceDto.getUserNom();
+        String serviceOffertNom = demandeServiceDto.getServiceOffertNom();
+        LocalDateTime dateRendezvous = demandeServiceDto.getDateRendezvous();
+        String statut = demandeServiceDto.getStatut();
+
+        // Sauvegarder la demande
         DemandeService savedDemandeService = demandeServiceService.save(
                 demandeService,
-                demandeServiceDto.getServiceOffertId(),
-                demandeServiceDto.getUserId()
+                serviceOffertId,
+                userId,
+                userNom,
+                serviceOffertNom,
+                dateRendezvous,
+                statut
         );
 
         if (savedDemandeService != null) {
-            // Si la demande a été sauvegardée avec succès
             return new ResponseEntity<>(demandeServiceConverter.map(savedDemandeService), HttpStatus.CREATED);
         } else {
-            // Si un des éléments est invalide (utilisateur ou service offert non trouvé)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }

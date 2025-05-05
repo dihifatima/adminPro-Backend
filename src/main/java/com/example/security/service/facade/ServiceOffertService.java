@@ -9,4 +9,7 @@ public interface ServiceOffertService {
     Optional<ServiceOffert> findByName(String name);
     ServiceOffert updateServiceDetails(Long id, String newName);
     List<ServiceOffert> findAll(); // إذا كنت تحتاجها في الواجهة
-    ServiceOffert save(ServiceOffert service);}
+    ServiceOffert save(ServiceOffert service);
+    void deleteById(Long id); // ✅ Nouvelle méthode pour suppression
+
+}

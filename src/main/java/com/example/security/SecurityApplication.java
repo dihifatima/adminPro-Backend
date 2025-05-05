@@ -10,9 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import com.example.security.dao.ServiceOffertRepository;
-import  com.example.security.entity.ServiceOffert;
 @SpringBootApplication
 @EnableJpaAuditing
+
 @EnableAsync
 public class SecurityApplication {
 	public static void main(String[] args) {
