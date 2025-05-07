@@ -36,21 +36,26 @@ public class DemandeService {
 
     private LocalDateTime dateRendezvous;
 
-    // ✅ Nouveau : nom de l'utilisateur (copié de User)
+    // Nouveau : nom de l'utilisateur (copié de User)
     private String userNom;
 
-    // ✅ Nouveau : nom du service (copié de ServiceOffert)
+    //  Nouveau : nom du service (copié de ServiceOffert)
     private String serviceOffertNom;
-    // ✅ Un utilisateur fait plusieurs demandes
+    //Un utilisateur fait plusieurs demandes
     @ManyToOne
+    //c’est la table demande_service qui contient la colonne user_id pour indiquer à quel utilisateur appartient chaque demande.
     @JoinColumn(name = "user_id")
     private User user;
 
-    // ✅ Une demande est liée à un seul service
+    //  Une demande est liée à un seul service
     @ManyToOne
     @JoinColumn(name = "service_offert_id")
     private ServiceOffert serviceOffert;
 
-    // ✅ Statut : en attente, traité...
+    // Statut : en attente, traité...
     private String statut; // Ex : "EN_ATTENTE", "TRAITÉ"
+
+    public void setFilePath(String string) {
+
+    }
 }

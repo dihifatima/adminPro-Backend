@@ -6,9 +6,16 @@ import com.example.security.ws.converter.DemandeServiceConverter;
 import com.example.security.ws.dto.DemandeServiceDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -24,29 +31,43 @@ public class DemandeServiceController {
     private DemandeServiceConverter demandeServiceConverter;
 
     // Créer une nouvelle demande de service
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DemandeServiceDto> createDemandeService(
-            @RequestBody DemandeServiceDto demandeServiceDto) {
+            @RequestPart("demandeService") DemandeServiceDto demandeServiceDto,
+            @RequestPart("file") MultipartFile file
+    ) {
+        try {
+            // Sauvegarde physique du fichier
+            String uploadDir = "uploads/";
+            Files.createDirectories(Paths.get(uploadDir));
 
+            String fileName = file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir + fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        DemandeService demandeService = demandeServiceConverter.map(demandeServiceDto);
+            // Mapper le DTO vers l'entité
+            DemandeService demandeService = demandeServiceConverter.map(demandeServiceDto);
 
+            // Associer le chemin du fichier à la demande (si tu as un champ filePath dans DemandeService)
+            demandeService.setFilePath(filePath.toString()); // ajoute ce champ dans l'entité si nécessaire
 
+            // Sauvegarder la demande
+            DemandeService savedDemandeService = demandeServiceService.save(
+                    demandeService,
+                    demandeServiceDto.getServiceOffertId(),
+                    demandeServiceDto.getUserId()
+            );
 
-
-        // Sauvegarder la demande
-        DemandeService savedDemandeService = demandeServiceService.save(
-                demandeService,
-                demandeServiceDto.getServiceOffertId(),
-                demandeServiceDto.getUserId()
-        );
-
-        if (savedDemandeService != null) {
-            return new ResponseEntity<>(demandeServiceConverter.map(savedDemandeService), HttpStatus.CREATED);
-        } else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            if (savedDemandeService != null) {
+                return new ResponseEntity<>(demandeServiceConverter.map(savedDemandeService), HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     // Récupérer une demande de service par son ID

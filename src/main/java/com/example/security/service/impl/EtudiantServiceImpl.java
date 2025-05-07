@@ -3,11 +3,17 @@ package com.example.security.service.impl;
 import com.example.security.dao.EtudiantRepository;
 import com.example.security.entity.Etudiant;
 import com.example.security.service.facade.EtudiantService;
-import com.example.security.ws.dto.EtudiantDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 @Service
 public class EtudiantServiceImpl implements EtudiantService {
@@ -16,18 +22,7 @@ public class EtudiantServiceImpl implements EtudiantService {
     public EtudiantServiceImpl(EtudiantRepository etudiantRepository) {
         this.etudiantRepository = etudiantRepository;
     }
-
-   /* @Override
-    public int save(Etudiant etudiant) {
-        if (findByEmail(etudiant.getEmail()) != null) {
-            return -1; // étudiant existe déjà
-        } else {
-            etudiantRepository.save(etudiant);
-            return 1; // succès
-        }
-    }*/
-
-    @Override
+    /*@Override
     public int update(Etudiant etudiant) {
         Etudiant existing = findByEmail(etudiant.getEmail());
         if (existing == null) return -1;
@@ -45,28 +40,61 @@ public class EtudiantServiceImpl implements EtudiantService {
 
         etudiantRepository.save(existing);
         return 0;
+    }*/
+    @Override
+    public int updateComplet(String email, String niveauEtude, String filiere, String etablissementActuel,
+                             MultipartFile scanBac, MultipartFile cinScan, MultipartFile photos, MultipartFile releveNotes) throws IOException {
+
+        Etudiant etudiant = etudiantRepository.findByEmail(email);
+        if (etudiant == null) return -1;
+
+        if (niveauEtude != null) etudiant.setNiveauEtude(niveauEtude);
+        if (filiere != null) etudiant.setFiliere(filiere);
+        if (etablissementActuel != null) etudiant.setEtablissementActuel(etablissementActuel);
+
+        Path uploadPath = Paths.get("uploads/etudiants").toAbsolutePath().normalize();
+        Files.createDirectories(uploadPath);
+        if (scanBac != null && !scanBac.isEmpty()) {
+            System.out.println("Téléchargement du fichier scanBac");
+            etudiant.setScanBacPath(saveFile(uploadPath, scanBac));
+        }
+        if (cinScan != null && !cinScan.isEmpty()) {
+            System.out.println("Téléchargement du fichier cinScan");
+            etudiant.setCinScanPath(saveFile(uploadPath, cinScan));
+        }
+        if (photos != null && !photos.isEmpty()) {
+            System.out.println("Téléchargement du fichier photos");
+            etudiant.setPhotos(saveFile(uploadPath, photos));
+        }
+        if (releveNotes != null && !releveNotes.isEmpty()) {
+            System.out.println("Téléchargement du fichier releveNotes");
+            etudiant.setReleveDeNotesScanPath(saveFile(uploadPath, releveNotes));
+        }
+        etudiantRepository.save(etudiant);
+        return 0;
     }
 
+    private String saveFile(Path uploadDir, MultipartFile file) throws IOException {
+        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = System.currentTimeMillis() + "_" + originalFilename;
+        Path filePath = uploadDir.resolve(fileName);
+        // Log pour débogage
+        System.out.println("Enregistrement du fichier : " + originalFilename + " de type " + file.getContentType());
 
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        // إرجاع المسار النسبي: "uploads/etudiants/..."
+        return "uploads/etudiants/" + fileName;
+    }
 
     @Override
     public Etudiant findByEmail(String email) {
-        /* il est tout à fait logique de rechercher un étudiant par son email, surtout si l'email est unique pour chaque étudiant.
-        C'est une pratique courante dans de nombreux systèmes où l'email sert d'identifiant unique pour chaque utilisateur.
-         Vous pouvez donc garder la méthode findByEmail sans problème.*/
         return etudiantRepository.findByEmail(email);
     }
 
     @Override
     @Transactional
-    /*
-    Méthode deleteById(Long id) :
-Cette méthode supprime un étudiant en utilisant son ID.
-Elle vérifie d'abord si l'étudiant avec cet ID existe dans la base de données via existsById.
-Si l'étudiant n'existe pas, elle retourne -1.
-Si l'étudiant existe, il est supprimé via deleteById, et la méthode retourne 1 pour indiquer que la suppression a réussi.
-La méthode est annotée avec @Transactional, ce qui garantit que l'opération de suppression est exécutée de manière transactionnelle.
-    */
+
     public int deleteById(Long id) {
         if (!etudiantRepository.existsById(id)) {
             return -1; // ID non trouvé
@@ -75,8 +103,7 @@ La méthode est annotée avec @Transactional, ce qui garantit que l'opération d
             return 1; // suppression réussie
         }
     }
-    /*Cette méthode récupère et retourne la liste de tous les étudiants présents
-    dans la base de données en utilisant la méthode findAll du EtudiantRepository.*/
+
     @Override
     public List<Etudiant> findAll() {
         return etudiantRepository.findAll();

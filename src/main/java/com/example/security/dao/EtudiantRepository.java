@@ -1,6 +1,8 @@
 package com.example.security.dao;
 
 import com.example.security.entity.Etudiant;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
@@ -12,8 +14,5 @@ public interface EtudiantRepository extends JpaRepository<Etudiant, Long> {
 
     Etudiant findByEmail(String email);
 
-   /* @Query("SELECT e FROM Etudiant e JOIN User u ON e.id = u.id WHERE u.email = :email")
-        Etudiant findByEmail(@Param("email") String email);
-*/
-    
+
 }

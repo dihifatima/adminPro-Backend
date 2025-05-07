@@ -37,8 +37,8 @@ public class SecurityApplication {
 			if(roleRepository.findByName("ENTREPRENEUR").isEmpty()){
 				roleRepository.save(Role.builder().name("ENTREPRENEUR").build());
 			}
-			if(roleRepository.findByName("PORTE_VISA").isEmpty()){
-				roleRepository.save(Role.builder().name("PORTE_VISA").build());
+			if(roleRepository.findByName("PORTEVISA").isEmpty()){
+				roleRepository.save(Role.builder().name("PORTEVISA").build());
 			}
 
 		});
