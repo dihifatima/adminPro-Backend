@@ -37,6 +37,12 @@ public class RegistrationRequest {
     @Email(message = "L'email n'est pas bien formaté")
     @NotEmpty(message = "L'email est obligatoire")
     private String email;
+    @NotEmpty(message = "Le numéro de téléphone est obligatoire")
+    private String telephone;
+
+
+
+
     @NotEmpty(message = "Le mot de passe est obligatoire")
     @Size(min = 8, message = "Le mot de passe doit comporter au moins 8 caractères")
     private String password;

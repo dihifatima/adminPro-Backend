@@ -49,6 +49,8 @@ public class User implements UserDetails, Principal {
     @Column(unique = true)
     private String email;
     private String password;
+    private String telephone;
+
     private boolean accountLocked;
     private boolean enabled;
     @CreatedDate
@@ -117,4 +119,5 @@ public class User implements UserDetails, Principal {
      public String getFullName(){
         return firstname +" "+ lastname;
      }
+
 }

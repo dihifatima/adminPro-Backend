@@ -28,7 +28,7 @@ public interface EtudiantService {
         return 0;
     }*/
     int updateComplet(String email, String niveauEtude, String filiere, String etablissementActuel,
-                      MultipartFile scanBac, MultipartFile cinScan, MultipartFile photos, MultipartFile releveNotes) throws IOException;
+                      MultipartFile scanBac, MultipartFile cinScan, MultipartFile photos, MultipartFile releveDeNotesScan) throws IOException;
 
     Etudiant findByEmail(String email);
     int deleteById(Long id);

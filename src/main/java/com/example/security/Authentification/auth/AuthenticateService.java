@@ -56,6 +56,7 @@ public class AuthenticateService {
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
@@ -72,6 +73,7 @@ public class AuthenticateService {
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
@@ -93,6 +95,7 @@ public class AuthenticateService {
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
@@ -116,6 +119,7 @@ public class AuthenticateService {
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
@@ -135,6 +139,7 @@ public class AuthenticateService {
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
@@ -155,6 +160,7 @@ public class AuthenticateService {
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
@@ -193,7 +199,9 @@ public class AuthenticateService {
         );
         var claims = new HashMap<String, Object>();
         var user = ((User) auth.getPrincipal());
+        // Ajouter le numéro de téléphone dans les claims
         claims.put("fullName", user.getFullName());
+        claims.put("telephone", user.getTelephone());  // Ajout du téléphone
         var jwtToken = jwtService.generateToken(claims, user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)

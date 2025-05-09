@@ -13,6 +13,7 @@ public class EtudiantDto {
     private String firstname;
     private String lastname;
     private String email;
+    private String telephone;
 
     // Champs spécifiques à Etudiant
     private String niveauEtude;

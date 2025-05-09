@@ -21,10 +21,10 @@ public class Etudiant extends User {
     private String  niveauEtude;
     private String filiere;
     private String etablissementActuel; // Nom de l'établissement actuel
-    private String ScanBacPath;
-    private String CinScanPath;
-    private String Photos;
-    private String ReleveDeNotesScanPath;
+    private String scanBac;
+    private String cinScan;
+    private String photos;
+    private String releveDeNotesScan;
 
 
 

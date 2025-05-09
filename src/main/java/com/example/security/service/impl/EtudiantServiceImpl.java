@@ -15,75 +15,91 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+
 @Service
 public class EtudiantServiceImpl implements EtudiantService {
     @Autowired
     private final EtudiantRepository etudiantRepository;
+
     public EtudiantServiceImpl(EtudiantRepository etudiantRepository) {
         this.etudiantRepository = etudiantRepository;
     }
-    /*@Override
-    public int update(Etudiant etudiant) {
-        Etudiant existing = findByEmail(etudiant.getEmail());
-        if (existing == null) return -1;
 
-        // Mise à jour uniquement des champs non nuls
-        if (etudiant.getFirstname() != null) existing.setFirstname(etudiant.getFirstname());
-        if (etudiant.getLastname() != null) existing.setLastname(etudiant.getLastname());
-        if (etudiant.getNiveauEtude() != null) existing.setNiveauEtude(etudiant.getNiveauEtude());
-        if (etudiant.getFiliere() != null) existing.setFiliere(etudiant.getFiliere());
-        if (etudiant.getEtablissementActuel() != null) existing.setEtablissementActuel(etudiant.getEtablissementActuel());
-        if (etudiant.getScanBacPath() != null) existing.setScanBacPath(etudiant.getScanBacPath());
-        if (etudiant.getCinScanPath() != null) existing.setCinScanPath(etudiant.getCinScanPath());
-        if (etudiant.getPhotos() != null) existing.setPhotos(etudiant.getPhotos());
-        if (etudiant.getReleveDeNotesScanPath() != null) existing.setReleveDeNotesScanPath(etudiant.getReleveDeNotesScanPath());
-
-        etudiantRepository.save(existing);
-        return 0;
-    }*/
     @Override
     public int updateComplet(String email, String niveauEtude, String filiere, String etablissementActuel,
-                             MultipartFile scanBac, MultipartFile cinScan, MultipartFile photos, MultipartFile releveNotes) throws IOException {
+                             MultipartFile scanBac, MultipartFile cinScan, MultipartFile photos,
+                             MultipartFile releveDeNotesScan) throws IOException {
+
+        System.out.println("Début de updateComplet pour: " + email);
 
         Etudiant etudiant = etudiantRepository.findByEmail(email);
-        if (etudiant == null) return -1;
+        if (etudiant == null) {
+            System.out.println("Étudiant non trouvé: " + email);
+            return -1;
+        }
 
         if (niveauEtude != null) etudiant.setNiveauEtude(niveauEtude);
         if (filiere != null) etudiant.setFiliere(filiere);
         if (etablissementActuel != null) etudiant.setEtablissementActuel(etablissementActuel);
 
-        Path uploadPath = Paths.get("uploads/etudiants").toAbsolutePath().normalize();
+        // S'assurer que le répertoire existe
+        Path uploadPath = Paths.get("uploads/etudiants").toAbsolutePath();
         Files.createDirectories(uploadPath);
-        if (scanBac != null && !scanBac.isEmpty()) {
-            System.out.println("Téléchargement du fichier scanBac");
-            etudiant.setScanBacPath(saveFile(uploadPath, scanBac));
+        System.out.println("Répertoire de stockage: " + uploadPath);
+
+        // Traitement des fichiers
+        try {
+            if (scanBac != null && !scanBac.isEmpty()) {
+                String path = saveFile(uploadPath, scanBac);
+                etudiant.setScanBac(path);
+                System.out.println("Bac sauvegardé: " + path);
+            }
+
+            if (cinScan != null && !cinScan.isEmpty()) {
+                String path = saveFile(uploadPath, cinScan);
+                etudiant.setCinScan(path);
+                System.out.println("CIN sauvegardé: " + path);
+            }
+
+            if (photos != null && !photos.isEmpty()) {
+                String path = saveFile(uploadPath, photos);
+                etudiant.setPhotos(path);
+                System.out.println("Photo sauvegardée: " + path);
+            }
+
+            if (releveDeNotesScan != null && !releveDeNotesScan.isEmpty()) {
+                String path = saveFile(uploadPath, releveDeNotesScan);
+                etudiant.setReleveDeNotesScan(path);
+                System.out.println("Relevé de notes sauvegardé: " + path);
+            }
+
+            etudiantRepository.save(etudiant);
+            System.out.println("Étudiant sauvegardé avec succès.");
+            return 0;
+        } catch (Exception e) {
+            System.err.println("Erreur pendant la sauvegarde des fichiers: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
-        if (cinScan != null && !cinScan.isEmpty()) {
-            System.out.println("Téléchargement du fichier cinScan");
-            etudiant.setCinScanPath(saveFile(uploadPath, cinScan));
-        }
-        if (photos != null && !photos.isEmpty()) {
-            System.out.println("Téléchargement du fichier photos");
-            etudiant.setPhotos(saveFile(uploadPath, photos));
-        }
-        if (releveNotes != null && !releveNotes.isEmpty()) {
-            System.out.println("Téléchargement du fichier releveNotes");
-            etudiant.setReleveDeNotesScanPath(saveFile(uploadPath, releveNotes));
-        }
-        etudiantRepository.save(etudiant);
-        return 0;
     }
 
     private String saveFile(Path uploadDir, MultipartFile file) throws IOException {
         String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
         String fileName = System.currentTimeMillis() + "_" + originalFilename;
         Path filePath = uploadDir.resolve(fileName);
-        // Log pour débogage
-        System.out.println("Enregistrement du fichier : " + originalFilename + " de type " + file.getContentType());
 
+        System.out.println("Sauvegarde du fichier: " + originalFilename + " vers " + filePath);
+
+        // Copie le fichier avec remplacement si existe déjà
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        // إرجاع المسار النسبي: "uploads/etudiants/..."
+        // Vérification
+        if (Files.exists(filePath)) {
+            System.out.println("Fichier créé avec succès: " + filePath);
+        } else {
+            System.out.println("ERREUR: Le fichier n'a pas été créé: " + filePath);
+        }
+
         return "uploads/etudiants/" + fileName;
     }
 
@@ -94,7 +110,6 @@ public class EtudiantServiceImpl implements EtudiantService {
 
     @Override
     @Transactional
-
     public int deleteById(Long id) {
         if (!etudiantRepository.existsById(id)) {
             return -1; // ID non trouvé
@@ -118,11 +133,4 @@ public class EtudiantServiceImpl implements EtudiantService {
     public List<Etudiant> findByFirstnameOrLastname(String firstname, String lastname) {
         return etudiantRepository.findByFirstnameOrLastname(firstname, lastname);
     }
-
-
-
-
 }
-
-
-
