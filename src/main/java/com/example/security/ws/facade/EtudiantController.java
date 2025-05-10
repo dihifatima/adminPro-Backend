@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("api/etudiants")
+@RequestMapping("/etudiants")
 public class EtudiantController {
 
     @Autowired
@@ -43,16 +43,28 @@ public class EtudiantController {
             @RequestParam(required = false) MultipartFile scanBac,
             @RequestParam(required = false) MultipartFile cinScan,
             @RequestParam(required = false) MultipartFile photos,
-            @RequestParam(required = false) MultipartFile releveNotes
+            @RequestParam(required = false) MultipartFile releveDeNotesScan
     ) throws IOException {
+        System.out.println("Requête reçue à /update-complet");
+        System.out.println("niveauEtude: " + niveauEtude);
+        System.out.println("filiere: " + filiere);
+        System.out.println("etablissementActuel: " + etablissementActuel);
+        System.out.println("scanBac présent: " + (scanBac != null && !scanBac.isEmpty()));
+        System.out.println("cinScan présent: " + (cinScan != null && !cinScan.isEmpty()));
+        System.out.println("photos présent: " + (photos != null && !photos.isEmpty()));
+        System.out.println("releveNotesScan présent: " + (releveDeNotesScan != null && !releveDeNotesScan.isEmpty()));
+
         // Enlever "Bearer " du token
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
-        String email = jwtService.extractUsername(token); // C’est ton email ici
+        String email = jwtService.extractUsername(token);
+        System.out.println("Email extrait du token: " + email);
 
         int result = service.updateComplet(email, niveauEtude, filiere, etablissementActuel,
-                scanBac, cinScan, photos, releveNotes);
+                scanBac, cinScan, photos, releveDeNotesScan);
+
+        System.out.println("Résultat de l'opération: " + result);
 
         if (result == -1) {
             return ResponseEntity.notFound().build();  // Étudiant introuvable

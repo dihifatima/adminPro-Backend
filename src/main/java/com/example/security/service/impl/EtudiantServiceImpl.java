@@ -31,7 +31,7 @@ public class EtudiantServiceImpl implements EtudiantService {
                              MultipartFile releveDeNotesScan) throws IOException {
 
         System.out.println("Début de updateComplet pour: " + email);
-
+//🔸 نبحث في قاعدة البيانات عن الطالب بهذا الإيميل. إذا لم يُعثر عليه، تُرجع -1
         Etudiant etudiant = etudiantRepository.findByEmail(email);
         if (etudiant == null) {
             System.out.println("Étudiant non trouvé: " + email);

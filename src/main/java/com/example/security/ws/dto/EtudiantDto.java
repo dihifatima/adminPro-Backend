@@ -19,9 +19,9 @@ public class EtudiantDto {
     private String niveauEtude;
     private String filiere;
     private String etablissementActuel;
-    private String scanBacPath;
-    private String cinScanPath;
+    private String scanBac;
+    private String cinScan;
     private String photos;
-    private String releveDeNotesScanPath;
+    private String releveDeNotesScan;
 
 }
