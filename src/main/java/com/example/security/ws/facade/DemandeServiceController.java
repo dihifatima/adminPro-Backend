@@ -4,25 +4,17 @@ import com.example.security.entity.DemandeService;
 import com.example.security.service.facade.DemandeServiceService;
 import com.example.security.ws.converter.DemandeServiceConverter;
 import com.example.security.ws.dto.DemandeServiceDto;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
-@RequestMapping("/api/demandes")
-@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/demandesService")
 public class DemandeServiceController {
     @Autowired
     private DemandeServiceService demandeServiceService;
@@ -30,95 +22,74 @@ public class DemandeServiceController {
     @Autowired
     private DemandeServiceConverter demandeServiceConverter;
 
-    // Créer une nouvelle demande de service
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DemandeServiceDto> createDemandeService(
-            @RequestPart("demandeService") DemandeServiceDto demandeServiceDto,
-            @RequestPart("file") MultipartFile file
-    ) {
+    @PostMapping("/create")
+    public ResponseEntity<?> createDemande(@Valid @RequestBody DemandeServiceDto demandeServiceDto) {
         try {
-            // Sauvegarde physique du fichier
-            String uploadDir = "uploads/";
-            Files.createDirectories(Paths.get(uploadDir));
-
-            String fileName = file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir + fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // Mapper le DTO vers l'entité
             DemandeService demandeService = demandeServiceConverter.map(demandeServiceDto);
-
-            // Associer le chemin du fichier à la demande (si tu as un champ filePath dans DemandeService)
-            demandeService.setFilePath(filePath.toString()); // ajoute ce champ dans l'entité si nécessaire
-
-            // Sauvegarder la demande
-            DemandeService savedDemandeService = demandeServiceService.save(
-                    demandeService,
-                    demandeServiceDto.getServiceOffertId(),
-                    demandeServiceDto.getUserId()
-            );
-
-            if (savedDemandeService != null) {
-                return new ResponseEntity<>(demandeServiceConverter.map(savedDemandeService), HttpStatus.CREATED);
-            } else {
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            }
-        } catch (IOException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            DemandeService savedDemandeService = demandeServiceService.save(demandeService);
+            DemandeServiceDto savedDto = demandeServiceConverter.map(savedDemandeService);
+            return new ResponseEntity<>(savedDto, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Erreur : " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erreur inattendue lors de la création de la demande : " + e.getMessage());
+        }
+    }
+    @PutMapping("/statut")
+    public ResponseEntity<?> updateStatut(@RequestParam String ref, @RequestParam String statut) {
+        try {
+            DemandeService updated = demandeServiceService.updateStatut(ref, statut);
+            return ResponseEntity.ok(demandeServiceConverter.map(updated));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Erreur : " + e.getMessage());
         }
     }
 
-
-
-    // Récupérer une demande de service par son ID
-    @GetMapping("/{id}")
-    public ResponseEntity<DemandeServiceDto> getDemandeServiceById(@PathVariable Long id) {
-        Optional<DemandeService> demandeServiceOpt = demandeServiceService.findById(id);
-        if (demandeServiceOpt.isPresent()) {
-            return new ResponseEntity<>(demandeServiceConverter.map(demandeServiceOpt.get()), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // ✅ Chercher par référence
+    @GetMapping("/ref/{ref}")
+    public ResponseEntity<?> getByRef(@PathVariable String ref) {
+        try {
+            DemandeService found = demandeServiceService.findByRef(ref);
+            return ResponseEntity.ok(demandeServiceConverter.map(found));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Demande non trouvée : " + e.getMessage());
         }
     }
 
-    // Récupérer toutes les demandes de services
-    @GetMapping
-    public ResponseEntity<List<DemandeServiceDto>> getAllDemandesService() {
-        List<DemandeService> demandesServices = demandeServiceService.findAll();
-        return new ResponseEntity<>(demandeServiceConverter.mapListEntities(demandesServices), HttpStatus.OK);
-    }
-
-    // Mettre à jour le statut d'une demande de service
-    @PutMapping("/{id}")
-    public ResponseEntity<DemandeServiceDto> updateStatut(
-            @PathVariable Long id,
-            @RequestParam String nouveauStatut) {
-        DemandeService updatedDemandeService = demandeServiceService.updateStatut(id, nouveauStatut);
-        if (updatedDemandeService != null) {
-            return new ResponseEntity<>(demandeServiceConverter.map(updatedDemandeService), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    // ✅ Supprimer par référence
+    @DeleteMapping("/delete/{ref}")
+    public ResponseEntity<?> deleteByRef(@PathVariable String ref) {
+        try {
+            int deleted = demandeServiceService.deleteByRef(ref);
+            return ResponseEntity.ok("Demande supprimée avec succès.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Erreur : " + e.getMessage());
         }
     }
 
-    // Supprimer une demande de service
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDemandeService(@PathVariable Long id) {
-        demandeServiceService.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    // ✅ Afficher toutes les demandes
+    @GetMapping("/all")
+    public ResponseEntity<List<DemandeServiceDto>> getAll() {
+        List<DemandeService> demandes = demandeServiceService.findAll();
+        return ResponseEntity.ok(demandes.stream().map(demandeServiceConverter::map).toList());
     }
 
-    // Récupérer les demandes de service par utilisateur
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<DemandeServiceDto>> getDemandesByUser(@PathVariable Long userId) {
-        List<DemandeService> demandesServices = demandeServiceService.findByUserId(userId);
-        return new ResponseEntity<>(demandeServiceConverter.mapListEntities(demandesServices), HttpStatus.OK);
+    // ✅ Chercher par nom utilisateur
+    @GetMapping("/user")
+    public ResponseEntity<List<DemandeServiceDto>> getByUserNom(@RequestParam String nom) {
+        List<DemandeService> demandes = demandeServiceService.findByUserNom(nom);
+        return ResponseEntity.ok(demandes.stream().map(demandeServiceConverter::map).toList());
     }
 
-    // Récupérer les demandes de service par service offert
-    @GetMapping("/service/{serviceOffertId}")
-    public ResponseEntity<List<DemandeServiceDto>> getDemandesByServiceOffert(@PathVariable Long serviceOffertId) {
-        List<DemandeService> demandesServices = demandeServiceService.findByServiceOffertId(serviceOffertId);
-        return new ResponseEntity<>(demandeServiceConverter.mapListEntities(demandesServices), HttpStatus.OK);
+    // ✅ Chercher par nom du service offert
+    @GetMapping("/service")
+    public ResponseEntity<List<DemandeServiceDto>> getByServiceNom(@RequestParam String nom) {
+        List<DemandeService> demandes = demandeServiceService.findByServiceOffertNom(nom);
+        return ResponseEntity.ok(demandes.stream().map(demandeServiceConverter::map).toList());
     }
+
+
+
 }

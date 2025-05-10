@@ -7,16 +7,20 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Component
 public class DemandeServiceConverter {
+
     public DemandeServiceDto map(DemandeService entity) {
         DemandeServiceDto dto = new DemandeServiceDto();
         if (entity != null) {
+            // Copie des propriétés simples
             BeanUtils.copyProperties(entity, dto);
 
+            // Champs personnalisés à partir des associations
             if (entity.getUser() != null) {
                 dto.setUserId(entity.getUser().getId());
-                dto.setUserNom(entity.getUser().getFullName()); // ✅ nom complet de l'utilisateur
+                dto.setUserNom(entity.getUser().getFullName()); // ✅ nom complet
             }
 
             if (entity.getServiceOffert() != null) {
@@ -30,8 +34,9 @@ public class DemandeServiceConverter {
     public DemandeService map(DemandeServiceDto dto) {
         DemandeService entity = new DemandeService();
         if (dto != null) {
-            BeanUtils.copyProperties(dto, entity);
-            // user & serviceOffert are set in the service layer
+            // On copie uniquement les champs nécessaires à la création
+            entity.setDateRendezvous(dto.getDateRendezvous());
+            // ref, user, serviceOffert, statut, dateSoumission seront complétés dans le service
         }
         return entity;
     }

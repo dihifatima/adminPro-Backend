@@ -8,24 +8,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DemandeServiceService  {
-    // Sauvegarder une nouvelle demande de service avec serviceOffert et user associés
 
-    DemandeService save(DemandeService demandeService,Long serviceOffertId,Long UserId );
-
-
-    Optional<DemandeService> findById(Long id);
-
-    // Récupérer toutes les demandes de service
+    DemandeService save(DemandeService demandeService );
+    DemandeService updateStatut(String ref, String nouveauStatut);
+    DemandeService findByRef(String ref);
+    int deleteByRef(String ref);
     List<DemandeService> findAll();
-    // Mettre à jour le statut d'une demande de service
-    DemandeService updateStatut(Long id, String nouveauStatut);
+    // Recherche des demandes par le nom de l'utilisateur
+    List<DemandeService> findByUserNom(String userNom);
 
-    // Supprimer une demande de service par son ID
-    void deleteById(Long id);
-
-    // Récupérer les demandes de service par utilisateur
-    List<DemandeService> findByUserId(Long userId);
-
-    // Récupérer les demandes de service par service offert
-    List<DemandeService> findByServiceOffertId(Long serviceOffertId);
+    // Recherche des demandes par le nom du service offert
+    List<DemandeService> findByServiceOffertNom(String serviceOffertNom);
 }

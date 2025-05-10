@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DemandeServiceDto {
     private Long id;
+    private String ref ;
     private Long userId;
     private String userNom;
     private Long ServiceOffertId;
