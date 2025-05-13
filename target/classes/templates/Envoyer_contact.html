@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveau Contact - Notification</title>
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    .container {
+        max-width: 600px;
+        margin: 10px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+        color: #333;
+        font-size: 24px;
+    }
+    p {
+        color: #555;
+        font-size: 16px;
+    }
+    .contact-details {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+    }
+    .contact-details p {
+        margin: 5px 0;
+    }
+    .contact-details strong {
+        color: #333;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Nouveau Contact - Notification</h1>
+  <p>Un nouveau contact a été soumis via le formulaire de contact de votre site.</p>
+
+  <!-- Détails du contact -->
+  <div class="contact-details">
+    <p><strong>Nom :</strong> <span th:text="${contact.nom}"></span></p>
+    <p><strong>Email :</strong> <span th:text="${contact.email}"></span></p>
+    <p><strong>Message :</strong> <span th:text="${contact.message}"></span></p>
+  </div>
+
+  <p>Veuillez répondre au plus vite à ce message. Merci.</p>
+</div>
+</body>
+</html>

@@ -1,8 +1,5 @@
 package com.example.security.service.impl;
 
-
-
-
 import com.example.security.Authentification.security.JwtService;
 import com.example.security.Authentification.user.User;
 import com.example.security.Authentification.user.UserRepository;
@@ -19,18 +16,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-
 @Service
 public class DemandeServiceServiceImpl implements DemandeServiceService {
 
     private final DemandeServiceRepository demandeServiceRepository;
-
     private final UserRepository userRepository;
-
     private final ServiceOffertRepository serviceOffertRepository;
-   private final JwtService jwtService;
-private  final HttpServletRequest request;
-
+    private final JwtService jwtService;
+    private final HttpServletRequest request;
 
     public DemandeServiceServiceImpl(DemandeServiceRepository demandeServiceRepository, UserRepository userRepository, ServiceOffertRepository serviceOffertRepository, JwtService jwtService, HttpServletRequest request) {
         this.demandeServiceRepository = demandeServiceRepository;
@@ -39,8 +32,6 @@ private  final HttpServletRequest request;
         this.jwtService = jwtService;
         this.request = request;
     }
-
-
 
     @Override
     public DemandeService save(DemandeService demande) {
@@ -82,13 +73,10 @@ private  final HttpServletRequest request;
         newDemande.setStatut("EN_ATTENTE");
         newDemande.setUser(user);
         newDemande.setServiceOffert(serviceOffert);
-        newDemande.setUserNom(user.getFullName());
-        newDemande.setServiceOffertNom(serviceOffert.getName());
 
         // 6. Sauvegarde
         return demandeServiceRepository.save(newDemande);
     }
-
 
     @Override
     public DemandeService updateStatut(String ref, String nouveauStatut) {
@@ -129,18 +117,13 @@ private  final HttpServletRequest request;
     }
 
     @Override
-    public List<DemandeService> findByUserNom(String userNom) {
-        return demandeServiceRepository.findByUserNom(userNom);
+    public List<DemandeService> findByUserFullName(String userNom) {
+        return demandeServiceRepository.findByUserFullName(userNom);
     }
 
     @Override
     public List<DemandeService> findByServiceOffertNom(String serviceOffertNom) {
-        return demandeServiceRepository.findByServiceOffertNom(serviceOffertNom);
+        // Updated to use the corrected repository method
+        return demandeServiceRepository.findByServiceOffert_Name(serviceOffertNom);
     }
-
-
-
-
-
-
 }

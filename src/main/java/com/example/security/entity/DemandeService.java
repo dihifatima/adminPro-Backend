@@ -27,11 +27,6 @@ public class DemandeService {
     @Column(updatable = false)
     private LocalDateTime dateSoumission;
     private LocalDateTime dateRendezvous;
-    // Nouveau : nom de l'utilisateur (copié de User)
-    private String userNom;
-    //  Nouveau : nom du service (copié de ServiceOffert)
-    private String serviceOffertNom;
-    //Un utilisateur fait plusieurs demandes
     @ManyToOne
     //c’est la table demande_service qui contient la colonne user_id pour indiquer à quel utilisateur appartient chaque demande.
     @JoinColumn(name = "user_id")

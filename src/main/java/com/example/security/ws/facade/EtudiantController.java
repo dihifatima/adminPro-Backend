@@ -72,6 +72,22 @@ public class EtudiantController {
 
         return ResponseEntity.ok(result);
     }
+    @GetMapping("/admin/fichier/{nomFichier}")
+    public ResponseEntity<byte[]> telechargerFichier(@PathVariable String nomFichier) throws IOException {
+        Path chemin = Paths.get("uploads/etudiants").resolve(nomFichier).normalize();
+
+        if (!Files.exists(chemin)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        byte[] contenu = Files.readAllBytes(chemin);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header("Content-Disposition", "attachment; filename=\"" + nomFichier + "\"")
+                .body(contenu);
+    }
+
 
     @GetMapping("email/{email}")
     public ResponseEntity<EtudiantDto> findByEmail(@PathVariable String email) {
@@ -88,7 +104,7 @@ public class EtudiantController {
         return service.deleteById(id);
     }
 
-    @GetMapping()
+    @GetMapping("/admin")
     public List<EtudiantDto> findAll() {
         List<Etudiant> entites = service.findAll();
         return converter.mapListEntities(entites);
@@ -104,9 +120,5 @@ public class EtudiantController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/search")
-    public List<EtudiantDto> searchEtudiants(@RequestParam String firstname, @RequestParam String lastname) {
-        List<Etudiant> etudiants = service.findByFirstnameOrLastname(firstname, lastname);
-        return converter.mapListEntities(etudiants);
-    }
+
 }

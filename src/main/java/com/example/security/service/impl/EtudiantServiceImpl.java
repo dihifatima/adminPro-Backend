@@ -100,7 +100,7 @@ public class EtudiantServiceImpl implements EtudiantService {
             System.out.println("ERREUR: Le fichier n'a pas été créé: " + filePath);
         }
 
-        return "uploads/etudiants/" + fileName;
+        return  fileName;
     }
 
     @Override
@@ -129,8 +129,5 @@ public class EtudiantServiceImpl implements EtudiantService {
         return etudiantRepository.findById(id).orElse(null);
     }
 
-    @Override
-    public List<Etudiant> findByFirstnameOrLastname(String firstname, String lastname) {
-        return etudiantRepository.findByFirstnameOrLastname(firstname, lastname);
-    }
+
 }

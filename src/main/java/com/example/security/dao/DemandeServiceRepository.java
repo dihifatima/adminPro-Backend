@@ -10,12 +10,12 @@ import java.util.List;
 
 
 public interface DemandeServiceRepository extends JpaRepository<DemandeService, Long> {
-
     DemandeService findByRef(String ref);
 
-    List<DemandeService> findByUserNom(String userNom);
-    List<DemandeService> findByServiceOffertNom(String serviceOffertNom);
+    @Query("SELECT d FROM DemandeService d WHERE CONCAT(d.user.firstname, ' ', d.user.lastname) = :fullName")
+    List<DemandeService> findByUserFullName(@Param("fullName") String fullName);
+
+    List<DemandeService> findByServiceOffert_Name(String name);
+
     DemandeService findByUser_EmailAndServiceOffert_Name(String email, String name);
-
-
 }

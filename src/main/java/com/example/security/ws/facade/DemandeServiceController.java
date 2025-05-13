@@ -79,7 +79,7 @@ public class DemandeServiceController {
     // ✅ Chercher par nom utilisateur
     @GetMapping("/user")
     public ResponseEntity<List<DemandeServiceDto>> getByUserNom(@RequestParam String nom) {
-        List<DemandeService> demandes = demandeServiceService.findByUserNom(nom);
+        List<DemandeService> demandes = demandeServiceService.findByUserFullName(nom);
         return ResponseEntity.ok(demandes.stream().map(demandeServiceConverter::map).toList());
     }
 

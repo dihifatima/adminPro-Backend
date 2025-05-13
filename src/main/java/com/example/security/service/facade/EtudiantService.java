@@ -36,5 +36,4 @@ public interface EtudiantService {
     Etudiant getEtudiantById(Long id); //Récupérer un étudiant par ID.
 
 
-    List<Etudiant> findByFirstnameOrLastname(String firstname, String lastname);
 }
