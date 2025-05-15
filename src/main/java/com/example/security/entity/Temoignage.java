@@ -15,20 +15,12 @@ public class Temoignage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nom;
-
     private String ville;
-
-    private String statutClient;
-
     private String typeService;
-
     @Column(length = 1500)
     private String description;
-
-    private String imageUrl;
-
     private LocalDateTime dateSoumission;
+    private Long nbrDeStart ;
 
 }

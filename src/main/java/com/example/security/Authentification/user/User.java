@@ -59,7 +59,8 @@ public class User implements UserDetails, Principal {
     @LastModifiedDate
     @Column(insertable = false)
     private LocalDateTime lastModifiedAt;
-
+    @Column(nullable = false)
+    private boolean  consentGDPR = false ;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
@@ -68,7 +69,7 @@ public class User implements UserDetails, Principal {
     )
     private List<Role> roles;
 
-    @OneToMany
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Token> tokens;
 
     @OneToMany(mappedBy = "user")

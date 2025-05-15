@@ -13,7 +13,7 @@ public class DemandeServiceDto {
     private String ref ;
     private Long userId;
     private String userNom;
-    private Long ServiceOffertId;
+    private Long serviceOffertId;
     private String serviceOffertNom;
     private LocalDateTime dateSoumission;
     private LocalDateTime dateRendezvous;

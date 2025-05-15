@@ -39,13 +39,11 @@ public class RegistrationRequest {
     private String email;
     @NotEmpty(message = "Le numéro de téléphone est obligatoire")
     private String telephone;
-
-
-
-
     @NotEmpty(message = "Le mot de passe est obligatoire")
     @Size(min = 8, message = "Le mot de passe doit comporter au moins 8 caractères")
     private String password;
+    @AssertTrue(message = "Vous devez accepter les conditions d'utilisation et la politique de confidentialité")
+    private boolean consentGDPR;
 
 
 

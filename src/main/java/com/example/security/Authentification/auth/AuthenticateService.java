@@ -61,6 +61,7 @@ public class AuthenticateService {
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
                     .enabled(false)
+                    .consentGDPR(request.isConsentGDPR())
                     .build();
 
             adminRepository.save(admin);//Enregistrement de l'Admin dans la base de données
@@ -78,6 +79,7 @@ public class AuthenticateService {
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
                     .enabled(false)
+                    .consentGDPR(request.isConsentGDPR())
                     .build();
 
             adminSecondaireRepository.save(adminSecondaire);
@@ -99,6 +101,7 @@ public class AuthenticateService {
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
+                    .consentGDPR(request.isConsentGDPR())
                     .enabled(false)
                     .build();
 
@@ -123,6 +126,7 @@ public class AuthenticateService {
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
+                    .consentGDPR(request.isConsentGDPR())
                     .enabled(false)
                     .build();
 
@@ -143,6 +147,7 @@ public class AuthenticateService {
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
+                    .consentGDPR(request.isConsentGDPR())
                     .enabled(false)
                     .build();
 
@@ -164,6 +169,7 @@ public class AuthenticateService {
                     .roles(List.of(userRole))
                     .password(passwordEncoder.encode(request.getPassword()))
                     .accountLocked(false)
+                    .consentGDPR(request.isConsentGDPR())
                     .enabled(false)
                     .build();
 

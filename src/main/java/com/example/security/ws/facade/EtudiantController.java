@@ -99,7 +99,7 @@ public class EtudiantController {
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("id/{id}")
+    @DeleteMapping("/admin/id/{id}")
     public int deleteByRef(@PathVariable Long id) {
         return service.deleteById(id);
     }
