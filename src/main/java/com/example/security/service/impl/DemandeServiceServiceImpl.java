@@ -115,6 +115,10 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
         // Retourner toutes les demandes
         return demandeServiceRepository.findAll();
     }
+    public List<LocalDateTime> findAllReservedDates() {
+        return demandeServiceRepository.findAllReservedDates();
+    }
+
 
     @Override
     public List<DemandeService> findByUserFullName(String userNom) {

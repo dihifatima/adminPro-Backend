@@ -1,37 +1,36 @@
 package com.example.security.ws.converter;
 
-import com.example.security.entity.BlocActualites;
-import com.example.security.ws.dto.BlocActualitesDto;
+import com.example.security.entity.BlockActuality;
+import com.example.security.ws.dto.BlockActualityDto;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 @Component
-public class BlocActualitesConverter {
+public class BlockActualityConverter {
 
-    public BlocActualites map(BlocActualitesDto dto) {
-        BlocActualites entity = new BlocActualites();
+    public BlockActuality map(BlockActualityDto dto) {
+        BlockActuality entity = new BlockActuality();
         if (dto != null) {
             BeanUtils.copyProperties(dto, entity);
         }
         return entity;
     }
 
-    public BlocActualitesDto map(BlocActualites entity) {
-        BlocActualitesDto dto = new BlocActualitesDto();
+    public BlockActualityDto map(BlockActuality entity) {
+        BlockActualityDto dto = new BlockActualityDto();
         if (entity != null) {
             BeanUtils.copyProperties(entity, dto);
         }
         return dto;
     }
 
-    public List<BlocActualites> mapListDtos(List<BlocActualitesDto> dtos) {
+    public List<BlockActuality> mapListDtos(List<BlockActualityDto> dtos) {
         return dtos.stream().map(this::map).collect(Collectors.toList());
     }
 
-    public List<BlocActualitesDto> mapListEntities(List<BlocActualites> entities) {
+    public List<BlockActualityDto> mapListEntities(List<BlockActuality> entities) {
         return entities.stream().map(this::map).collect(Collectors.toList());
     }
 }

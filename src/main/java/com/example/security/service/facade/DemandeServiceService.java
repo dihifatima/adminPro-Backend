@@ -3,6 +3,7 @@ package com.example.security.service.facade;
 
 import com.example.security.entity.DemandeService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface DemandeServiceService  {
@@ -17,4 +18,6 @@ public interface DemandeServiceService  {
 
     // Recherche des demandes par le nom du service offert
     List<DemandeService> findByServiceOffertNom(String serviceOffertNom);
+
+    List<LocalDateTime> findAllReservedDates();
 }

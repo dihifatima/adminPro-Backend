@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -89,6 +90,13 @@ public class DemandeServiceController {
         List<DemandeService> demandes = demandeServiceService.findByServiceOffertNom(nom);
         return ResponseEntity.ok(demandes.stream().map(demandeServiceConverter::map).toList());
     }
+    // ✅ Récupérer toutes les dates de rendez-vous réservées
+    @GetMapping("/dates-reservees")
+    public ResponseEntity<List<LocalDateTime>> getReservedDates() {
+        List<LocalDateTime> dates = demandeServiceService.findAllReservedDates();
+        return ResponseEntity.ok(dates);
+    }
+
 
 
 
