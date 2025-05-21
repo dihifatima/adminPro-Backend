@@ -6,14 +6,8 @@ import com.example.security.service.facade.EtudiantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -25,7 +19,7 @@ public class EtudiantServiceImpl implements EtudiantService {
         this.etudiantRepository = etudiantRepository;
     }
 
-    @Override
+   /* @Override
     public int updateComplet(String email, String niveauEtude, String filiere, String etablissementActuel,
                              MultipartFile scanBac, MultipartFile cinScan, MultipartFile photos,
                              MultipartFile releveDeNotesScan) throws IOException {
@@ -101,6 +95,32 @@ public class EtudiantServiceImpl implements EtudiantService {
         }
 
         return  fileName;
+    }*/
+
+    @Override
+    public int updateComplet(String email, String codeMassar, String codeCIN, LocalDate dateNaissance, String lieuNaissance, String adresse, String genre, String nationalite, String niveauScolaire, String mentionBac, String typeBac, String anneeBac) throws IOException {
+        System.out.println("Début de updateComplet pour: " + email);
+       //🔸 نبحث في قاعدة البيانات عن الطالب بهذا الإيميل. إذا لم يُعثر عليه، تُرجع -1
+        Etudiant etudiant = etudiantRepository.findByEmail(email);
+        if (etudiant == null) {
+            System.out.println("Étudiant non trouvé: " + email);
+            return -1;
+        }
+        if (codeMassar != null) etudiant.setCodeMassar(codeMassar);
+        if (codeCIN != null) etudiant.setCodeCIN(codeCIN);
+        if (dateNaissance != null) etudiant.setDateNaissance(dateNaissance);
+        if (lieuNaissance != null) etudiant.setLieuNaissance(lieuNaissance);
+        if (adresse != null) etudiant.setAdresse(adresse);
+        if (genre != null) etudiant.setGenre(genre);
+        if (nationalite != null) etudiant.setNationalite(nationalite);
+        if (niveauScolaire != null) etudiant.setNiveauScolaire(niveauScolaire);
+        if (mentionBac != null) etudiant.setMentionBac(mentionBac);
+        if (anneeBac != null) etudiant.setAnneeBac(anneeBac);
+        if (typeBac != null) etudiant.setTypeBac(typeBac);
+        etudiantRepository.save(etudiant);
+        System.out.println("Étudiant sauvegardé avec succès.");
+        return 0;
+
     }
 
     @Override

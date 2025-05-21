@@ -38,7 +38,6 @@ public class AuthenticateService {
     private final EtudiantRepository  etudiantRepository;
     private final PorteVisaRepository porteVisaRepository;
     private final EntrepreneurRepository entrepreneurRepository;
-    private final AdminSecondaireRepository adminSecondaireRepository;
     private final ParticulierRepository particulierRepository;
     private final EmailService emailService;
     private final AuthenticationManager authenticationManager;
@@ -66,25 +65,7 @@ public class AuthenticateService {
 
             adminRepository.save(admin);//Enregistrement de l'Admin dans la base de données
             emailService.sendValidationEmail(admin); // Envoi du mail de validation pour un admin
-         }else if (request.isAdminSecondaire()) {
-            userRole = roleRepository.findByName("ADMINSECONDAIRE")
-                    .orElseThrow(() -> new IllegalStateException("Le rôle ADMINSECONDAIRE est introuvable ou non défini dans la base de données"));
-
-            AdminSecondaire adminSecondaire = AdminSecondaire.builder()
-                    .email(request.getEmail())
-                    .firstname(request.getFirstname())
-                    .lastname(request.getLastname())
-                    .telephone(request.getTelephone())
-                    .roles(List.of(userRole))
-                    .password(passwordEncoder.encode(request.getPassword()))
-                    .accountLocked(false)
-                    .enabled(false)
-                    .consentGDPR(request.isConsentGDPR())
-                    .build();
-
-            adminSecondaireRepository.save(adminSecondaire);
-            emailService.sendValidationEmail(adminSecondaire); // Envoi du mail de validation pour un admin secondaire
-        }
+         }
 
         else if (request.isEtudiant()) {
             if (userRepository.existsByEmail(request.getEmail())) {

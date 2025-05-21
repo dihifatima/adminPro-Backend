@@ -1,7 +1,4 @@
 package com.example.security.Authentification.auth;
-
-
-import jakarta.persistence.Entity;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +10,6 @@ import lombok.Setter;
 public class RegistrationRequest {
 
     private boolean isAdmin;
-    private boolean isAdminSecondaire;
     private boolean isEtudiant;
     private boolean isEntrepreneur;
     private boolean isParticulier;
@@ -23,7 +19,6 @@ public class RegistrationRequest {
     private boolean isExactlyOneRole() {
         int count = 0;
         if (isAdmin) count++;
-        if (isAdminSecondaire) count++;
         if (isEtudiant) count++;
         if (isEntrepreneur) count++;
         if (isParticulier) count++;

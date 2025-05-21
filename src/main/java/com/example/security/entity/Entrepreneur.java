@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -18,10 +20,13 @@ import lombok.experimental.SuperBuilder;
 @DiscriminatorValue("Entrepreneur")// si tu utilises l'héritage
 
 public class Entrepreneur extends User {
-    private String nomEntreprise;
-    private String secteurActivite;
-    private String registreCommerce;
-    private String identifiantFiscal;
-    private String typeEntreprise; // ex SARL SAS
+    private String cin;         // Nom de l'entreprise
+    private String nomEntreprise;         // Nom de l'entreprise
+    private String secteurActivite;       // Domaine d'activité
+    private String registreCommerce;      // Numéro RC
+    private String identifiantFiscal;     // Numéro IF
+    private String typeEntreprise;        // SARL, SAS, Auto-entrepreneur
+    private LocalDate dateCreation;       // Date de création de l'entreprise
+    private String siegeSocial;           // Adresse du siège social
 }
 

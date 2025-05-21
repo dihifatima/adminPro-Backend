@@ -7,7 +7,5 @@ import java.util.List;
 
 public interface EntrepreneurRepository extends JpaRepository<Entrepreneur, Long> {
 
-    List<Entrepreneur> findByFirstnameOrLastname(String firstname, String lastname);
-
     Entrepreneur findByEmail(String email);
 }

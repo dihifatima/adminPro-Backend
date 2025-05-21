@@ -25,9 +25,7 @@ public class SecurityApplication {
 			if(roleRepository.findByName("ADMIN").isEmpty()){
 				roleRepository.save(Role.builder().name("ADMIN").build());
 			}
-			if(roleRepository.findByName("ADMIN_SECONDAIRE").isEmpty()){
-				roleRepository.save(Role.builder().name("ADMIN_SECONDAIRE").build());
-			}
+
 			if(roleRepository.findByName("ETUDIANT").isEmpty()){
 				roleRepository.save(Role.builder().name("ETUDIANT").build());
 			}

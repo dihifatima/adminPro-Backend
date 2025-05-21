@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -17,9 +19,12 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @DiscriminatorValue("Particulier")
 public class Particulier extends User {
-    private String objetDemande;
-    private String ville;
-    private String cinScanUrl;
-    private String documentPrincipalUrl;
-    private String noteSupplementaire;
+    private String objetDemande;           // Objet du service demandé
+    private String ville;                  // Ville de résidence
+    private String adresse;                // Adresse complète
+    private String codeCIN;                // Code de la carte d'identité
+    private String lieuNaissance;          // Facultatif selon contexte
+    private String nationalite;
+    private String genre;                  // Homme / Femme
+    private LocalDate dateNaissance;
 }
