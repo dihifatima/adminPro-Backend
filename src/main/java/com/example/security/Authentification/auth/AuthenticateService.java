@@ -36,7 +36,7 @@ public class AuthenticateService {
     private final TokenRepository tokenRepository;
     private final AdminRepository adminRepository;
     private final EtudiantRepository  etudiantRepository;
-    private final PorteVisaRepository porteVisaRepository;
+    private final DemandeurVisaRepository porteVisaRepository;
     private final EntrepreneurRepository entrepreneurRepository;
     private final ParticulierRepository particulierRepository;
     private final EmailService emailService;
@@ -142,7 +142,7 @@ public class AuthenticateService {
             userRole = roleRepository.findByName("PORTEVISA")
                     .orElseThrow(() -> new IllegalStateException("Le rôle PORTEVISA est introuvable ou non défini dans la base de données"));
 
-            PorteVisa porteVisa = PorteVisa.builder()
+            DemandeurVisa porteVisa = DemandeurVisa.builder()
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())

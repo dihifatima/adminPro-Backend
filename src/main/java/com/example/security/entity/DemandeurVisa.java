@@ -1,21 +1,25 @@
-package com.example.security.ws.dto;
+package com.example.security.entity;
 
+import com.example.security.Authentification.user.User;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
-@Data  // Annotation Lombok pour générer automatiquement getters, setters, equals, hashCode et toString
+
+@Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PorteVisaDto {
-    // Champs hérités de User
-    private Long id;
-    private String firstname;
-    private String lastname;
-    private String email;
-    private String telephone;
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+@DiscriminatorValue("DemandeurVisa")
 
+public class DemandeurVisa extends User {
     private String codeCIN;              // Carte d'identité nationale
     private String passportNumber;       // Numéro de passeport
     private LocalDate dateDelivrancePassport;

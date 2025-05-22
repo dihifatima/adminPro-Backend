@@ -1,15 +1,13 @@
 package com.example.security.ws.facade;
-
 import com.example.security.Authentification.security.JwtService;
-import com.example.security.entity.PorteVisa;
-import com.example.security.service.facade.PorteVisaService;
-import com.example.security.ws.converter.PorteVisaConverter;
-import com.example.security.ws.dto.PorteVisaDto;
+import com.example.security.entity.DemandeurVisa;
+import com.example.security.service.facade.DemandeurVisaService;
+import com.example.security.ws.converter.DemandeurVisaConverter;
+import com.example.security.ws.dto.DemandeurVisaDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -17,17 +15,17 @@ import java.util.List;
 @RequestMapping("/porteVisa")
 public class PorteVisaController {
     @Autowired
-    private PorteVisaService service;
+    private DemandeurVisaService service;
 
     @Autowired
-    private PorteVisaConverter converter;
+    private DemandeurVisaConverter converter;
 
     @Autowired
     private JwtService jwtService;
 
     @PutMapping("/update-complet")
     public ResponseEntity<Integer> updateComplet(
-            @RequestHeader("Authorization") String token, @RequestBody PorteVisaDto porteVisaDto
+            @RequestHeader("Authorization") String token, @RequestBody DemandeurVisaDto demandeurVisaDto
     ) throws IOException {
         System.out.println("Requête reçue à /update-complet");
 
@@ -41,18 +39,18 @@ public class PorteVisaController {
         // Update the call to match the service interface method signature
         int result = service.updateComplet(
                 email,
-                porteVisaDto.getCodeCIN(),
-                porteVisaDto.getDateNaissance(),
-                porteVisaDto.getPassportNumber(),
-                porteVisaDto.getLieuNaissance(),
-                porteVisaDto.getAdresse(),
-                porteVisaDto.getGenre(),
-                porteVisaDto.getNationalite(),
-                porteVisaDto.getDestinationVisa(),
-                porteVisaDto.getTypeVisa(),
-                porteVisaDto.getDureeSejour(),
-                porteVisaDto.getDateDelivrancePassport(),
-                porteVisaDto.getDateExpirationPassport()
+                demandeurVisaDto.getCodeCIN(),
+                demandeurVisaDto.getDateNaissance(),
+                demandeurVisaDto.getPassportNumber(),
+                demandeurVisaDto.getLieuNaissance(),
+                demandeurVisaDto.getAdresse(),
+                demandeurVisaDto.getGenre(),
+                demandeurVisaDto.getNationalite(),
+                demandeurVisaDto.getDestinationVisa(),
+                demandeurVisaDto.getTypeVisa(),
+                demandeurVisaDto.getDureeSejour(),
+                demandeurVisaDto.getDateDelivrancePassport(),
+                demandeurVisaDto.getDateExpirationPassport()
         );
 
         System.out.println("Résultat de l'opération: " + result);
@@ -66,12 +64,12 @@ public class PorteVisaController {
 
 
     @GetMapping("email/{email}")
-    public ResponseEntity<PorteVisaDto> findByEmail(@PathVariable String email) {
-        PorteVisa porteVisa = service.findByEmail(email);
-        if (porteVisa == null) {
+    public ResponseEntity<DemandeurVisaDto> findByEmail(@PathVariable String email) {
+        DemandeurVisa demandeurVisaDto = service.findByEmail(email);
+        if (demandeurVisaDto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        PorteVisaDto dto = converter.map(porteVisa);
+        DemandeurVisaDto dto = converter.map(demandeurVisaDto);
         return ResponseEntity.ok(dto);
     }
 
@@ -81,18 +79,18 @@ public class PorteVisaController {
     }
 
     @GetMapping("/admin")
-    public List<PorteVisaDto> findAll() {
-        List<PorteVisa> entites = service.findAll();
+    public List<DemandeurVisaDto> findAll() {
+        List<DemandeurVisa> entites = service.findAll();
         return converter.mapListEntities(entites);
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<PorteVisaDto> getPorteVisaById(@PathVariable Long id) {
-        PorteVisa porteVisa = service.getPorteVisaById(id);
-        if (porteVisa == null) {
+    public ResponseEntity<DemandeurVisaDto> getPorteVisaById(@PathVariable Long id) {
+        DemandeurVisa demandeurVisaDto = service.getDemandeurVisaById(id);
+        if (demandeurVisaDto == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        PorteVisaDto dto = converter.map(porteVisa);
+        DemandeurVisaDto dto = converter.map(demandeurVisaDto);
         return ResponseEntity.ok(dto);
     }
 }
