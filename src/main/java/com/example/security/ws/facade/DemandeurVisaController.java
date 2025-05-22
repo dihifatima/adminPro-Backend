@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/porteVisa")
+@RequestMapping("/demandeurVisa")
 public class DemandeurVisaController {
     @Autowired
     private DemandeurVisaService service;
