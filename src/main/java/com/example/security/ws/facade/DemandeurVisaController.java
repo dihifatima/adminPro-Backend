@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/porteVisa")
-public class PorteVisaController {
+public class DemandeurVisaController {
     @Autowired
     private DemandeurVisaService service;
 
