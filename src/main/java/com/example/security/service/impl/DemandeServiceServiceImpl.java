@@ -57,7 +57,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
             throw new RuntimeException("Type de client non supporté pour le moment");
         }
 
-        // ✅ 4. Vérifier s'il existe déjà une demande pour ce user + ce service
+        // 4. Vérifier s'il existe déjà une demande pour ce user + ce service
         DemandeService existing = demandeServiceRepository.findByUser_EmailAndServiceOffert_Name(
                 user.getEmail(), serviceOffert.getName());
 

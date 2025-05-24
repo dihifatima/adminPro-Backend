@@ -10,13 +10,9 @@ import java.util.Optional;
 public interface BlockActualityService {
 
     BlockActuality ajouterActualite(BlockActuality actualite);
-
     BlockActuality modifierActualite(Long id, BlockActuality actualite);
-
     void supprimerActualite(Long id);
-
     List<BlockActuality> getAllActualites();
-
     Optional<BlockActuality> getActualiteById(Long id);
 
     // Méthodes pour la gestion des images
@@ -24,4 +20,8 @@ public interface BlockActualityService {
 
     // Méthodes pour les statistiques
     void incrementViewCount(Long id);
+
+    // Nouvelles méthodes pour optimiser les performances
+    Optional<BlockActuality> getActualiteWithSections(Long id);
+    List<BlockActuality> getAllActualitesWithSections();
 }

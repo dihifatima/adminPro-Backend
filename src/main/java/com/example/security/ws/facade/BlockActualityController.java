@@ -27,17 +27,44 @@ public class BlockActualityController {
     }
 
     @PostMapping("/")
-    public BlockActualityDto ajouter(@RequestBody BlockActualityDto dto) {
-        BlockActuality actualite = converter.map(dto);
-        BlockActuality saved = blockActualityService.ajouterActualite(actualite);
-        return converter.map(saved);
+    public ResponseEntity<BlockActualityDto> ajouter(
+            @RequestPart("actualite") BlockActualityDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) {
+        try {
+            BlockActuality actualite = converter.map(dto);
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String filename = blockActualityService.storeImage(imageFile);
+                actualite.setImageUrl("/images/" + filename);
+            }
+
+            BlockActuality saved = blockActualityService.ajouterActualite(actualite);
+            return ResponseEntity.ok(converter.map(saved));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PutMapping("/{id}")
-    public BlockActualityDto modifier(@PathVariable Long id, @RequestBody BlockActualityDto dto) {
-        BlockActuality actualite = converter.map(dto);
-        BlockActuality updated = blockActualityService.modifierActualite(id, actualite);
-        return converter.map(updated);
+    public ResponseEntity<BlockActualityDto> modifier(
+            @PathVariable Long id,
+            @RequestPart("actualite") BlockActualityDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) {
+        try {
+            BlockActuality actualite = converter.map(dto);
+
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String filename = blockActualityService.storeImage(imageFile);
+                actualite.setImageUrl("/images/" + filename);
+            }
+
+            BlockActuality updated = blockActualityService.modifierActualite(id, actualite);
+            return ResponseEntity.ok(converter.map(updated));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @DeleteMapping("/{id}")
@@ -54,16 +81,5 @@ public class BlockActualityController {
     public BlockActualityDto getById(@PathVariable Long id) {
         Optional<BlockActuality> actualite = blockActualityService.getActualiteById(id);
         return actualite.map(converter::map).orElse(null);
-    }
-    // Endpoint pour télécharger une image
-    @PostMapping("/upload-image")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
-        try {
-            String filename = blockActualityService.storeImage(file);
-            return ResponseEntity.ok(filename);
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Impossible de télécharger l'image: " + e.getMessage());
-        }
     }
 }

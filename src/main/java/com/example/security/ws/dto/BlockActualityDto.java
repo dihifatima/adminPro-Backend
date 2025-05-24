@@ -14,35 +14,19 @@ import java.util.Set;
 public class BlockActualityDto {
     private Long id;
     private String titre;
+    private String introduction;
     private String slug;
     private String auteur;
     private String categorie;
-
     private String imageUrl;
-    private String imageName;
 
     private LocalDateTime datePublication;
-    private String statut; // BROUILLON, PUBLIE, ARCHIVE
+    private String statut;
+    private String conclusion;
 
     private Set<String> tags;
 
-    // === Contenu structuré ===
-    private String introduction;
+    private Set<BlogSectionDTO> sections = new HashSet<>();
 
-    private String titre1;
-    private String section1;
-
-    private String titre2;
-    private String section2;
-
-    private String titre3;
-    private String section3;
-
-    private String titre4;
-    private String section4;
-
-    private String conclusion;
-
-    // Statistiques
     private Integer viewCount;
 }

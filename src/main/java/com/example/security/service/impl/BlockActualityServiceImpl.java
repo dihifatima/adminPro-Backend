@@ -2,6 +2,7 @@ package com.example.security.service.impl;
 
 import com.example.security.dao.BlockActualityRepository;
 import com.example.security.entity.BlockActuality;
+import com.example.security.entity.BlogSection;
 import com.example.security.service.facade.BlockActualityService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,28 +42,26 @@ public class BlockActualityServiceImpl implements BlockActualityService {
             BlockActuality aModifier = existante.get();
 
             aModifier.setTitre(actualite.getTitre());
+            aModifier.setIntroduction(actualite.getIntroduction());
             aModifier.setAuteur(actualite.getAuteur());
             aModifier.setCategorie(actualite.getCategorie());
             aModifier.setImageUrl(actualite.getImageUrl());
-            aModifier.setImageName(actualite.getImageName());
             aModifier.setSlug(actualite.getSlug());
             aModifier.setDatePublication(actualite.getDatePublication());
             aModifier.setStatut(actualite.getStatut());
-            aModifier.setTags(actualite.getTags());
-
-            // Contenu structuré
-            aModifier.setIntroduction(actualite.getIntroduction());
-            aModifier.setTitre1(actualite.getTitre1());
-            aModifier.setSection1(actualite.getSection1());
-            aModifier.setTitre2(actualite.getTitre2());
-            aModifier.setSection2(actualite.getSection2());
-            aModifier.setTitre3(actualite.getTitre3());
-            aModifier.setSection3(actualite.getSection3());
-            aModifier.setTitre4(actualite.getTitre4());
-            aModifier.setSection4(actualite.getSection4());
             aModifier.setConclusion(actualite.getConclusion());
 
-            // Optionnel : mise à jour du compteur de vues
+            aModifier.setTags(actualite.getTags());
+
+            if (actualite.getSections() != null) {
+                aModifier.getSections().clear();
+
+                for (BlogSection section : actualite.getSections()) {
+                    section.setBlockActuality(aModifier);
+                    aModifier.getSections().add(section);
+                }
+            }
+
             aModifier.setViewCount(actualite.getViewCount());
             return blockActualityRepository.save(aModifier);
         } else {
@@ -76,13 +75,8 @@ public class BlockActualityServiceImpl implements BlockActualityService {
     }
 
     @Override
-    public List<BlockActuality> getAllActualites() {
-        return blockActualityRepository.findAll();
-    }
-
-    @Override
     public Optional<BlockActuality> getActualiteById(Long id) {
-        Optional<BlockActuality> actualite = blockActualityRepository.findById(id);
+        Optional<BlockActuality> actualite = blockActualityRepository.findByIdWithSections(id);
         if (actualite.isEmpty()) {
             System.out.println("L'ID " + id + " n'existe pas.");
         }
@@ -90,14 +84,17 @@ public class BlockActualityServiceImpl implements BlockActualityService {
     }
 
     @Override
+    public List<BlockActuality> getAllActualites() {
+        return blockActualityRepository.findAllWithSections();
+    }
+
+    @Override
     public String storeImage(MultipartFile file) throws IOException {
-        // Créer le répertoire s'il n'existe pas
         Path uploadPath = Paths.get(uploadDir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        // Générer un nom de fichier unique pour éviter les conflits
         String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
         // Copier le fichier dans le répertoire cible
@@ -114,5 +111,15 @@ public class BlockActualityServiceImpl implements BlockActualityService {
             a.incrementViewCount();
             blockActualityRepository.save(a);
         });
+    }
+
+    @Override
+    public Optional<BlockActuality> getActualiteWithSections(Long id) {
+        return blockActualityRepository.findByIdWithSections(id);
+    }
+
+    @Override
+    public List<BlockActuality> getAllActualitesWithSections() {
+        return blockActualityRepository.findAllWithSections();
     }
 }

@@ -30,7 +30,7 @@ public class EmailService2 {
             String htmlContent = templateEngine.process(EmailTemplateName2.EnvoyerContact.getName(), context);
 
             helper.setFrom(email);
-            helper.setTo("fatifaty715@gmail.com");
+            helper.setTo("ikramlin18@gmail.com");
             helper.setSubject("Nouveau message de " + nom);
             helper.setText(htmlContent, true);
 

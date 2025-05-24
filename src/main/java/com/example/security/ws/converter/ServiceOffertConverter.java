@@ -12,8 +12,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class ServiceOffertConverter {
-    // ترسل كل البيانات إلى الإداري:
-   //map(entity)	ينسخ كل شيء من الكيان إلى الـ DTO (للعرض فقط).
+
     public ServiceOffertDto map(ServiceOffert entity) {
         ServiceOffertDto dto = new ServiceOffertDto();
         if (entity != null) {
