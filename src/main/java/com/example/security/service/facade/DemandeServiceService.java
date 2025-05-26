@@ -1,23 +1,51 @@
 package com.example.security.service.facade;
 
-
 import com.example.security.entity.DemandeService;
-
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
-public interface DemandeServiceService  {
+public interface DemandeServiceService {
+    DemandeService saveAvecCreneau(DemandeService demande, Long creneauId);
 
-    DemandeService save(DemandeService demandeService );
-    DemandeService updateStatut(String ref, String nouveauStatut);
+    // Méthodes de base CRUD
+    DemandeService save(DemandeService demande);
+    DemandeService update(DemandeService demande);
+    DemandeService findById(Long id);
     DemandeService findByRef(String ref);
-    int deleteByRef(String ref);
     List<DemandeService> findAll();
-    // Recherche des demandes par le nom de l'utilisateur
+    int deleteById(Long id);
+    int deleteByRef(String ref);
+
+    // Gestion des statuts
+    DemandeService updateStatut(String ref, String nouveauStatut);
+    DemandeService accepterDemande(String ref, Long creneauId);
+    DemandeService refuserDemande(String ref, String motifRefus);
+    DemandeService annulerDemande(String ref);
+
+    // Recherches spécifiques
     List<DemandeService> findByUserFullName(String userNom);
-
-    // Recherche des demandes par le nom du service offert
     List<DemandeService> findByServiceOffertNom(String serviceOffertNom);
+    List<DemandeService> findByStatut(String statut);
+    List<DemandeService> findByUser(Long userId);
+    List<DemandeService> findByDateRange(LocalDate dateDebut, LocalDate dateFin);
+    List<DemandeService> findDemandesEnAttente();
+    List<DemandeService> findDemandesAcceptees();
+    List<DemandeService> findDemandesRefusees();
 
+    // Gestion des créneaux et dates
     List<LocalDateTime> findAllReservedDates();
+    List<DemandeService> findByDateRendezvous(LocalDate date);
+    boolean isDateDisponible(LocalDateTime dateRendezvous);
+    boolean hasDemandeForUserAndService(String userEmail, String serviceName);
+
+    // Statistiques et rapports
+    long countDemandesByStatut(String statut);
+    long countDemandesByUser(Long userId);
+    long countDemandesByService(Long serviceId);
+    List<DemandeService> findRecentDemandes(int nombreJours);
+
+    // Validation
+    void validateDemande(DemandeService demande);
+    boolean canUserCreateDemande(String userEmail, String serviceName);
 }

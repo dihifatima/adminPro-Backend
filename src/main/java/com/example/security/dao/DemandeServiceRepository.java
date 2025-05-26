@@ -24,4 +24,17 @@ public interface DemandeServiceRepository extends JpaRepository<DemandeService, 
     @Query("SELECT d.dateRendezvous FROM DemandeService d WHERE d.dateRendezvous IS NOT NULL")
     List<LocalDateTime> findAllReservedDates();
 
+    List<DemandeService> findByStatut(String statut);
+
+    List<DemandeService> findByUserId(Long userId);
+
+    List<DemandeService> findByDateRendezvousBetween(LocalDateTime dateTimeDebut, LocalDateTime dateTimeFin);
+
+    long countByServiceOffertId(Long serviceId);
+
+    List<DemandeService> findByDateSoumissionAfter(LocalDateTime dateLimit);
+
+    long countByUserId(Long userId);
+
+    long countByStatut(String statut);
 }

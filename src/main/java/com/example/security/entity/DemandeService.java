@@ -37,4 +37,8 @@ public class DemandeService {
     private ServiceOffert serviceOffert;
     // Statut : en attente, traité...
     private String statut; // Ex : "EN_ATTENTE", "TRAITÉ"
+
+    @ManyToOne
+    @JoinColumn(name = "creneau_id")
+    private Creneau creneau;  // Le créneau réservé
 }
