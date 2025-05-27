@@ -1,11 +1,9 @@
 package com.example.security.service.impl;
-
 import com.example.security.dao.EntrepreneurRepository;
 import com.example.security.entity.Entrepreneur;
 import com.example.security.service.facade.EntrepreneurService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,7 +13,6 @@ public class EntrepreneurServiceImpl implements EntrepreneurService {
 
     private final EntrepreneurRepository entrepreneurRepository;
 
-    @Autowired
     public EntrepreneurServiceImpl(EntrepreneurRepository entrepreneurRepository) {
         this.entrepreneurRepository = entrepreneurRepository;
     }
@@ -52,6 +49,7 @@ public class EntrepreneurServiceImpl implements EntrepreneurService {
 
     @Override
     public Entrepreneur findByEmail(String email) {
+
         return entrepreneurRepository.findByEmail(email);
     }
 
@@ -67,11 +65,13 @@ public class EntrepreneurServiceImpl implements EntrepreneurService {
 
     @Override
     public List<Entrepreneur> findAll() {
+
         return entrepreneurRepository.findAll();
     }
 
     @Override
     public Entrepreneur getEntrepreneurById(Long id) {
+
         return entrepreneurRepository.findById(id).orElse(null);
     }
 }

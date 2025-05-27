@@ -1,5 +1,4 @@
 package com.example.security.entity;
-
 import com.example.security.Authentification.user.User;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;

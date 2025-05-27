@@ -4,7 +4,6 @@ import com.example.security.service.facade.CreneauService;
 import com.example.security.ws.converter.CreneauConverter;
 import com.example.security.ws.dto.CreneauDto;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,11 +14,13 @@ import java.util.List;
 @RequestMapping("/creneaux")
 public class CreneauController {
 
-    @Autowired
-    private CreneauService creneauService;
+    private final  CreneauService creneauService;
+    private  final CreneauConverter creneauConverter;
 
-    @Autowired
-    private CreneauConverter creneauConverter;
+    public CreneauController(CreneauService creneauService, CreneauConverter creneauConverter) {
+        this.creneauService = creneauService;
+        this.creneauConverter = creneauConverter;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody CreneauDto dto) {
@@ -87,14 +88,4 @@ public class CreneauController {
                     .body("Erreur lors de la libération : " + e.getMessage());
         }
     }
-
-
-
-
-
-
-
-
-
-
 }

@@ -22,10 +22,9 @@ public class DemandeServiceDto {
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime dateSoumission;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime dateRendezvous;
 
-    private String statut;
+
+    private String statut = "en attent";
 
     // Champ pour le créneau
     private Long creneau;

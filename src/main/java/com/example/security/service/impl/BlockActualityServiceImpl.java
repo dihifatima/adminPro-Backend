@@ -25,7 +25,7 @@ public class BlockActualityServiceImpl implements BlockActualityService {
     @Value("${app.upload.dir:${user.home}/uploads/images}")
     private String uploadDir;
 
-    @Autowired
+
     public BlockActualityServiceImpl(BlockActualityRepository actualitesRepository) {
         this.blockActualityRepository = actualitesRepository;
     }
@@ -71,6 +71,7 @@ public class BlockActualityServiceImpl implements BlockActualityService {
 
     @Override
     public void supprimerActualite(Long id) {
+
         blockActualityRepository.deleteById(id);
     }
 
@@ -85,6 +86,7 @@ public class BlockActualityServiceImpl implements BlockActualityService {
 
     @Override
     public List<BlockActuality> getAllActualites() {
+
         return blockActualityRepository.findAllWithSections();
     }
 

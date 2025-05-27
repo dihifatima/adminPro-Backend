@@ -1,11 +1,9 @@
 package com.example.security.ws.facade;
-
 import com.example.security.entity.CreneauDisponibilite;
 import com.example.security.service.facade.CreneauDisponibiliteService;
 import com.example.security.ws.converter.CreneauDisponibiliteConverter;
 import com.example.security.ws.dto.CreneauDisponibiliteDto;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,11 +14,14 @@ import java.util.List;
 @RequestMapping("/creneaux-disponibilite")
 public class CreneauDisponibiliteController {
 
-    @Autowired
-    private CreneauDisponibiliteService creneauDisponibiliteService;
+    private final  CreneauDisponibiliteService creneauDisponibiliteService;
 
-    @Autowired
-    private CreneauDisponibiliteConverter creneauDisponibiliteConverter;
+    private  final CreneauDisponibiliteConverter creneauDisponibiliteConverter;
+
+    public CreneauDisponibiliteController(CreneauDisponibiliteService creneauDisponibiliteService, CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
+        this.creneauDisponibiliteService = creneauDisponibiliteService;
+        this.creneauDisponibiliteConverter = creneauDisponibiliteConverter;
+    }
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody CreneauDisponibiliteDto dto) {
@@ -55,17 +56,6 @@ public class CreneauDisponibiliteController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable Long id) {
-        try {
-            CreneauDisponibilite found = creneauDisponibiliteService.findById(id);
-            CreneauDisponibiliteDto dto = creneauDisponibiliteConverter.map(found);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Créneau disponibilité non trouvé : " + e.getMessage());
-        }
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getAll() {
@@ -74,12 +64,7 @@ public class CreneauDisponibiliteController {
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("/active")
-    public ResponseEntity<List<CreneauDisponibiliteDto>> getAllActive() {
-        List<CreneauDisponibilite> entities = creneauDisponibiliteService.findAllActive();
-        List<CreneauDisponibiliteDto> dtos = creneauDisponibiliteConverter.mapListEntities(entities);
-        return ResponseEntity.ok(dtos);
-    }
+
 
     @GetMapping("/jour/{jour}")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getByJour(@PathVariable DayOfWeek jour) {
@@ -99,27 +84,6 @@ public class CreneauDisponibiliteController {
         }
     }
 
-    @PutMapping("/activate/{id}")
-    public ResponseEntity<?> activate(@PathVariable Long id) {
-        try {
-            CreneauDisponibilite activated = creneauDisponibiliteService.activate(id);
-            CreneauDisponibiliteDto dto = creneauDisponibiliteConverter.map(activated);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Erreur : " + e.getMessage());
-        }
-    }
 
-    @PutMapping("/deactivate/{id}")
-    public ResponseEntity<?> deactivate(@PathVariable Long id) {
-        try {
-            CreneauDisponibilite deactivated = creneauDisponibiliteService.deactivate(id);
-            CreneauDisponibiliteDto dto = creneauDisponibiliteConverter.map(deactivated);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Erreur : " + e.getMessage());
-        }
-    }
+
 }

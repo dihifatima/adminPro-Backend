@@ -1,13 +1,10 @@
 package com.example.security.service.impl;
-
 import com.example.security.dao.CreneauDisponibiliteRepository;
 import com.example.security.entity.CreneauDisponibilite;
 import com.example.security.service.facade.CreneauDisponibiliteService;
-import com.example.security.service.facade.CreneauGenerationService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.List;
@@ -17,13 +14,8 @@ import java.util.Optional;
 @Transactional
 public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteService {
 
-    // Correction : enlever @Autowired du final field
+    @Autowired
     private final CreneauDisponibiliteRepository creneauDisponibiliteRepository;
-
-    // Injection optionnelle pour éviter les dépendances circulaires
-    @Autowired(required = false)
-    private CreneauGenerationService creneauGenerationService;
-
     public CreneauDisponibiliteServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository) {
         this.creneauDisponibiliteRepository = creneauDisponibiliteRepository;
     }
@@ -31,7 +23,6 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
     @Override
     public CreneauDisponibilite save(CreneauDisponibilite creneauDisponibilite) {
         validateCreneauDisponibilite(creneauDisponibilite);
-
         // Vérifier les chevauchements avant la sauvegarde
         if (hasTimeConflict(creneauDisponibilite)) {
             throw new IllegalArgumentException(
@@ -40,15 +31,18 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
                             creneauDisponibilite.getHeureDebut() + "-" + creneauDisponibilite.getHeureFin()
             );
         }
-
         CreneauDisponibilite saved = creneauDisponibiliteRepository.save(creneauDisponibilite);
-
-        // Régénérer les créneaux concrets si un service de génération est disponible
-        if (creneauGenerationService != null) {
-            creneauGenerationService.updateCreneauxAfterDisponibiliteChange(saved.getId());
-        }
-
         return saved;
+    }
+    private boolean hasTimeConflict(CreneauDisponibilite creneau) {
+        List<CreneauDisponibilite> existingCreneaux = creneauDisponibiliteRepository
+                .findByJourSemaineAndActifTrue(creneau.getJourSemaine());
+
+        return existingCreneaux.stream()
+                .anyMatch(existing -> timesOverlap(
+                        creneau.getHeureDebut(), creneau.getHeureFin(),
+                        existing.getHeureDebut(), existing.getHeureFin()
+                ));
     }
 
     @Override
@@ -56,14 +50,8 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
         if (creneauDisponibilite == null || creneauDisponibilite.getId() == null) {
             throw new IllegalArgumentException("CreneauDisponibilite ou son ID ne peut pas être null");
         }
-
-        // Vérifier que l'entité existe
-        CreneauDisponibilite existing = findById(creneauDisponibilite.getId());
-
-        // Valider les nouvelles données
+        Optional<CreneauDisponibilite> existing = creneauDisponibiliteRepository.findById(creneauDisponibilite.getId());
         validateCreneauDisponibilite(creneauDisponibilite);
-
-        // Vérifier les conflits horaires (en excluant l'entité actuelle)
         if (hasTimeConflictExcluding(creneauDisponibilite, creneauDisponibilite.getId())) {
             throw new IllegalArgumentException(
                     "Un autre créneau existe déjà pour ce jour et ces horaires : " +
@@ -71,106 +59,33 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
                             creneauDisponibilite.getHeureDebut() + "-" + creneauDisponibilite.getHeureFin()
             );
         }
-
         CreneauDisponibilite updated = creneauDisponibiliteRepository.save(creneauDisponibilite);
-
-        // Mettre à jour les créneaux concrets associés
-        if (creneauGenerationService != null) {
-            creneauGenerationService.updateCreneauxAfterDisponibiliteChange(updated.getId());
-        }
-
         return updated;
     }
 
-    @Override
-    public CreneauDisponibilite findById(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("L'ID ne peut pas être null");
-        }
-        return creneauDisponibiliteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CreneauDisponibilite non trouvé avec l'ID : " + id));
-    }
+
 
     @Override
     public List<CreneauDisponibilite> findAll() {
         return creneauDisponibiliteRepository.findAll();
     }
 
-    @Override
-    public List<CreneauDisponibilite> findAllActive() {
-        return creneauDisponibiliteRepository.findByActifTrue();
-    }
 
     @Override
-    public List<CreneauDisponibilite> findByJourSemaine(DayOfWeek jourSemaine) {
-        if (jourSemaine == null) {
-            throw new IllegalArgumentException("Le jour de la semaine ne peut pas être null");
-        }
-        return creneauDisponibiliteRepository.findByJourSemaineAndActifTrue(jourSemaine);
+    public List<CreneauDisponibilite> findByJourSemaine(DayOfWeek jour) {
+        return creneauDisponibiliteRepository.findByJourSemaine(jour);
     }
+
 
     @Override
     public int deleteById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("L'ID ne peut pas être null");
         }
-
-        CreneauDisponibilite creneauDisponibilite = findById(id);
-
-        // Vérifier si des créneaux concrets sont liés et ont des réservations
-        // Cette logique pourrait être ajoutée selon vos besoins métier
-
-        creneauDisponibiliteRepository.delete(creneauDisponibilite);
-
-        // Optionnel : nettoyer les créneaux concrets associés
-        if (creneauGenerationService != null) {
-            creneauGenerationService.synchronizeCreneauxWithDisponibilite();
-        }
-
+        Optional<CreneauDisponibilite> creneauDisponibilite = creneauDisponibiliteRepository.findById(id);
         return 1;
     }
 
-    @Override
-    public CreneauDisponibilite activate(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("L'ID ne peut pas être null");
-        }
-
-        CreneauDisponibilite creneauDisponibilite = findById(id);
-        creneauDisponibilite.setActif(true);
-        CreneauDisponibilite activated = creneauDisponibiliteRepository.save(creneauDisponibilite);
-
-        // Synchroniser les créneaux concrets
-        if (creneauGenerationService != null) {
-            creneauGenerationService.updateCreneauxAfterDisponibiliteChange(id);
-        }
-
-        return activated;
-    }
-
-    @Override
-    public CreneauDisponibilite deactivate(Long id) {
-        if (id == null) {
-            throw new IllegalArgumentException("L'ID ne peut pas être null");
-        }
-
-        CreneauDisponibilite creneauDisponibilite = findById(id);
-        creneauDisponibilite.setActif(false);
-        CreneauDisponibilite deactivated = creneauDisponibiliteRepository.save(creneauDisponibilite);
-
-        // Synchroniser les créneaux concrets
-        if (creneauGenerationService != null) {
-            creneauGenerationService.updateCreneauxAfterDisponibiliteChange(id);
-        }
-
-        return deactivated;
-    }
-
-    // ========== MÉTHODES UTILITAIRES ET VALIDATIONS ==========
-
-    /**
-     * Valide les données d'un créneau de disponibilité
-     */
     private void validateCreneauDisponibilite(CreneauDisponibilite creneauDisponibilite) {
         if (creneauDisponibilite == null) {
             throw new IllegalArgumentException("CreneauDisponibilite ne peut pas être null");
@@ -200,17 +115,9 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
             throw new IllegalArgumentException("La capacité maximale doit être supérieure à 0");
         }
 
-        if (creneauDisponibilite.getDureeMinutes() == null || creneauDisponibilite.getDureeMinutes() <= 0) {
-            throw new IllegalArgumentException("La durée en minutes doit être supérieure à 0");
-        }
-
-        // Validation des horaires d'ouverture (selon vos règles métier)
         validateBusinessHours(creneauDisponibilite);
     }
 
-    /**
-     * Valide que le créneau respecte les horaires d'ouverture
-     */
     private void validateBusinessHours(CreneauDisponibilite creneau) {
         LocalTime heureDebut = creneau.getHeureDebut();
         LocalTime heureFin = creneau.getHeureFin();
@@ -240,30 +147,10 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
         }
     }
 
-    /**
-     * Vérifie si un créneau est dans une plage horaire donnée
-     */
     private boolean isInTimeRange(LocalTime debut, LocalTime fin, LocalTime rangeDebut, LocalTime rangeFin) {
         return !debut.isBefore(rangeDebut) && !fin.isAfter(rangeFin);
     }
 
-    /**
-     * Vérifie s'il y a un conflit horaire avec un autre créneau
-     */
-    private boolean hasTimeConflict(CreneauDisponibilite creneau) {
-        List<CreneauDisponibilite> existingCreneaux = creneauDisponibiliteRepository
-                .findByJourSemaineAndActifTrue(creneau.getJourSemaine());
-
-        return existingCreneaux.stream()
-                .anyMatch(existing -> timesOverlap(
-                        creneau.getHeureDebut(), creneau.getHeureFin(),
-                        existing.getHeureDebut(), existing.getHeureFin()
-                ));
-    }
-
-    /**
-     * Vérifie s'il y a un conflit horaire en excluant un ID spécifique
-     */
     private boolean hasTimeConflictExcluding(CreneauDisponibilite creneau, Long excludeId) {
         List<CreneauDisponibilite> existingCreneaux = creneauDisponibiliteRepository
                 .findByJourSemaineAndActifTrue(creneau.getJourSemaine());
@@ -276,42 +163,24 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
                 ));
     }
 
-    /**
-     * Vérifie si deux plages horaires se chevauchent
-     */
     private boolean timesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
         return start1.isBefore(end2) && start2.isBefore(end1);
     }
-
-    // ========== MÉTHODES SUPPLÉMENTAIRES UTILES ==========
-
-    /**
-     * Trouve un créneau de disponibilité de manière optionnelle
-     */
-    public Optional<CreneauDisponibilite> findByIdOptional(Long id) {
+    Optional<CreneauDisponibilite> findByIdOptional(Long id) {
         if (id == null) {
             return Optional.empty();
         }
         return creneauDisponibiliteRepository.findById(id);
     }
 
-    /**
-     * Compte le nombre total de créneaux de disponibilité
-     */
     public long countAll() {
         return creneauDisponibiliteRepository.count();
     }
 
-    /**
-     * Compte le nombre de créneaux actifs
-     */
     public long countActive() {
         return creneauDisponibiliteRepository.countByActifTrue();
     }
 
-    /**
-     * Trouve tous les créneaux pour un jour donné (actifs et inactifs)
-     */
     public List<CreneauDisponibilite> findAllByJourSemaine(DayOfWeek jourSemaine) {
         if (jourSemaine == null) {
             throw new IllegalArgumentException("Le jour de la semaine ne peut pas être null");
@@ -319,9 +188,6 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
         return creneauDisponibiliteRepository.findByJourSemaine(jourSemaine);
     }
 
-    /**
-     * Active ou désactive tous les créneaux d'un jour donné
-     */
     @Transactional
     public int toggleDayAvailability(DayOfWeek jourSemaine, boolean actif) {
         if (jourSemaine == null) {
@@ -333,14 +199,7 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
         for (CreneauDisponibilite creneau : creneauxDuJour) {
             creneau.setActif(actif);
         }
-
         creneauDisponibiliteRepository.saveAll(creneauxDuJour);
-
-        // Synchroniser les créneaux concrets
-        if (creneauGenerationService != null) {
-            creneauGenerationService.synchronizeCreneauxWithDisponibilite();
-        }
-
         return creneauxDuJour.size();
     }
 }
