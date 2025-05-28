@@ -128,7 +128,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
             if (creneau.getHeureDebut() != null && creneau.getHeureFin() != null) {
                 if ((heure.equals(creneau.getHeureDebut()) || heure.isAfter(creneau.getHeureDebut())) &&
                         heure.isBefore(creneau.getHeureFin()) &&
-                        creneau.getCapaciteRestante() > 0) {
+                        creneau.getCapaciteMax() > 0) {
                     return creneau;
                 }
             }
@@ -154,7 +154,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
     }
 
     public List<Creneau> getAvailableCreneauxForDate(LocalDate date) {
-        return creneauRepository.findByDateCreneauAndActifTrueAndCapaciteRestanteGreaterThan(date, 0);
+        return creneauRepository.findByDateCreneauAndActifTrueAndCapaciteMaxGreaterThan(date, 0);
     }
 
 

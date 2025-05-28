@@ -15,15 +15,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/creneaux-gestion")
-public class AdminCreneauxController {
+public class CreneauxParDefautController {
 
     private final CreneauDisponibiliteService creneauDisponibiliteService;
     private final CreneauGenerationService creneauGenerationService;
     private final CreneauDisponibiliteConverter creneauDisponibiliteConverter;
 
-    public AdminCreneauxController(CreneauDisponibiliteService creneauDisponibiliteService,
-                                   CreneauGenerationService creneauGenerationService,
-                                   CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
+    public CreneauxParDefautController(CreneauDisponibiliteService creneauDisponibiliteService,
+                                       CreneauGenerationService creneauGenerationService,
+                                       CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
         this.creneauDisponibiliteService = creneauDisponibiliteService;
         this.creneauGenerationService = creneauGenerationService;
         this.creneauDisponibiliteConverter = creneauDisponibiliteConverter;

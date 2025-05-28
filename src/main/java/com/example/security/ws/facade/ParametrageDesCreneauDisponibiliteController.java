@@ -12,18 +12,18 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/creneaux-disponibilite")
-public class CreneauDisponibiliteController {
+public class ParametrageDesCreneauDisponibiliteController {
 
     private final  CreneauDisponibiliteService creneauDisponibiliteService;
 
     private  final CreneauDisponibiliteConverter creneauDisponibiliteConverter;
 
-    public CreneauDisponibiliteController(CreneauDisponibiliteService creneauDisponibiliteService, CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
+    public ParametrageDesCreneauDisponibiliteController(CreneauDisponibiliteService creneauDisponibiliteService, CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
         this.creneauDisponibiliteService = creneauDisponibiliteService;
         this.creneauDisponibiliteConverter = creneauDisponibiliteConverter;
     }
 
-    @PostMapping("/create")
+    /*@PostMapping("/create")
     public ResponseEntity<?> create(@Valid @RequestBody CreneauDisponibiliteDto dto) {
         try {
             CreneauDisponibilite entity = creneauDisponibiliteConverter.map(dto);
@@ -39,7 +39,7 @@ public class CreneauDisponibiliteController {
                     .body("Erreur inattendue : " + e.getMessage());
         }
     }
-
+*/
     @PutMapping("/update")
     public ResponseEntity<?> update(@Valid @RequestBody CreneauDisponibiliteDto dto) {
         try {
@@ -65,7 +65,7 @@ public class CreneauDisponibiliteController {
     }
 
 
-
+// pour voir planing de jour-http://localhost:8080/api/v1/creneaux-disponibilite/jour/MONDAY
     @GetMapping("/jour/{jour}")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getByJour(@PathVariable DayOfWeek jour) {
         List<CreneauDisponibilite> entities = creneauDisponibiliteService.findByJourSemaine(jour);
@@ -77,12 +77,13 @@ public class CreneauDisponibiliteController {
     public ResponseEntity<?> deleteById(@PathVariable Long id) {
         try {
             int deleted = creneauDisponibiliteService.deleteById(id);
-            return ResponseEntity.ok("Créneau disponibilité supprimé avec succès.");
+            return ResponseEntity.ok("Le créneau de disponibilité avec l'ID " + id + " a été supprimé avec succès.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body("Erreur : " + e.getMessage());
         }
     }
+
 
 
 

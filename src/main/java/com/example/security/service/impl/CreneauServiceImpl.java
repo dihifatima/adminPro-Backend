@@ -54,8 +54,8 @@ public class CreneauServiceImpl implements CreneauService {
             }
             creneau.setCreneauDisponibilite(creneauDispo);
             // Définir la capacité restante basée sur la capacité max
-            if (creneau.getCapaciteRestante() == null) {
-                creneau.setCapaciteRestante(creneauDispo.getCapaciteMax());
+            if (creneau.getCapaciteMax() == null) {
+                creneau.setCapaciteMax(creneauDispo.getCapaciteMax());
             }
         }
 
@@ -96,7 +96,7 @@ public class CreneauServiceImpl implements CreneauService {
     @Override
     public boolean isCreneauAvailable(Long creneauId) {
         Creneau creneau = findById(creneauId);
-        return creneau.getActif() && creneau.getCapaciteRestante() > 0;
+        return creneau.getActif() && creneau.getCapaciteMax() > 0;
     }
 
     @Override
@@ -107,11 +107,11 @@ public class CreneauServiceImpl implements CreneauService {
             throw new RuntimeException("Ce créneau n'est pas actif");
         }
 
-        if (creneau.getCapaciteRestante() <= 0) {
+        if (creneau.getCapaciteMax() <= 0) {
             throw new RuntimeException("Ce créneau n'a plus de places disponibles");
         }
 
-        creneau.setCapaciteRestante(creneau.getCapaciteRestante() - 1);
+        creneau.setCapaciteMax(creneau.getCapaciteMax() - 1);
         return creneauRepository.save(creneau);
     }
 
@@ -121,11 +121,11 @@ public class CreneauServiceImpl implements CreneauService {
 
         // Vérifier qu'on ne dépasse pas la capacité maximale
         int capaciteMax = creneau.getCreneauDisponibilite().getCapaciteMax();
-        if (creneau.getCapaciteRestante() >= capaciteMax) {
+        if (creneau.getCapaciteMax() >= capaciteMax) {
             throw new RuntimeException("La capacité maximale est déjà atteinte");
         }
 
-        creneau.setCapaciteRestante(creneau.getCapaciteRestante() + 1);
+        creneau.setCapaciteMax(creneau.getCapaciteMax() + 1);
         return creneauRepository.save(creneau);
     }
 
@@ -143,7 +143,7 @@ public class CreneauServiceImpl implements CreneauService {
             throw new RuntimeException("L'heure de début doit être antérieure à l'heure de fin");
         }
 
-        if (creneau.getCapaciteRestante() == null || creneau.getCapaciteRestante() < 0) {
+        if (creneau.getCapaciteMax() == null || creneau.getCapaciteMax() < 0) {
             throw new RuntimeException("La capacité restante ne peut pas être négative");
         }
 
@@ -152,7 +152,7 @@ public class CreneauServiceImpl implements CreneauService {
             throw new RuntimeException("Le créneau doit être lié à un créneau de disponibilité");
         }
 
-        if (creneau.getCapaciteRestante() > creneau.getCreneauDisponibilite().getCapaciteMax()) {
+        if (creneau.getCapaciteMax() > creneau.getCreneauDisponibilite().getCapaciteMax()) {
             throw new RuntimeException("La capacité restante ne peut pas dépasser la capacité maximale");
         }
 

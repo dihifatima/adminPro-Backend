@@ -90,10 +90,10 @@ public class CreneauGenerationServiceImpl implements CreneauGenerationService {
         LocalDate aujourdhui = LocalDate.now();
 
         // 1. Supprimer les créneaux futurs non réservés
-        List<Creneau> creneauxASupprimer = creneauRepository.findByDateCreneauAfterAndCapaciteRestanteGreaterThan(
+        List<Creneau> creneauxASupprimer = creneauRepository.findByDateCreneauAfterAndCapaciteMaxGreaterThan(
                 aujourdhui, 0);
         creneauxASupprimer = creneauxASupprimer.stream()
-                .filter(c -> c.getCapaciteRestante().equals(c.getCreneauDisponibilite().getCapaciteMax()))
+                .filter(c -> c.getCapaciteMax().equals(c.getCreneauDisponibilite().getCapaciteMax()))
                 .toList();
         creneauRepository.deleteAll(creneauxASupprimer);
 
@@ -132,7 +132,7 @@ public class CreneauGenerationServiceImpl implements CreneauGenerationService {
                     nouveauCreneau.setDateCreneau(date);
                     nouveauCreneau.setHeureDebut(creneauDispo.getHeureDebut());
                     nouveauCreneau.setHeureFin(creneauDispo.getHeureFin());
-                    nouveauCreneau.setCapaciteRestante(creneauDispo.getCapaciteMax());
+                    nouveauCreneau.setCapaciteMax(creneauDispo.getCapaciteMax());
                     nouveauCreneau.setActif(true);
                     nouveauCreneau.setCreneauDisponibilite(creneauDispo); // ✅ LIEN CRUCIAL
 

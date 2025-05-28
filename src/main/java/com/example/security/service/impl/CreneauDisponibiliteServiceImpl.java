@@ -78,13 +78,21 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
 
 
     @Override
+    @Transactional
     public int deleteById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("L'ID ne peut pas être null");
         }
-        Optional<CreneauDisponibilite> creneauDisponibilite = creneauDisponibiliteRepository.findById(id);
-        return 1;
+
+        Optional<CreneauDisponibilite> optional = creneauDisponibiliteRepository.findById(id);
+        if (optional.isPresent()) {
+            creneauDisponibiliteRepository.deleteById(id);
+            return 1;
+        } else {
+            throw new RuntimeException("Créneau avec l'ID " + id + " introuvable.");
+        }
     }
+
 
     private void validateCreneauDisponibilite(CreneauDisponibilite creneauDisponibilite) {
         if (creneauDisponibilite == null) {

@@ -4,9 +4,9 @@ import com.example.security.ws.dto.CreneauDto;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Component
 public class CreneauConverter {
-
 
     public CreneauDto map(Creneau entity) {
         if (entity == null) {
@@ -18,8 +18,12 @@ public class CreneauConverter {
         dto.setDateCreneau(entity.getDateCreneau());
         dto.setHeureDebut(entity.getHeureDebut());
         dto.setHeureFin(entity.getHeureFin());
-        dto.setCapaciteRestante(entity.getCapaciteRestante());
+        dto.setCapaciteMax(entity.getCapaciteMax());
         dto.setActif(entity.getActif());
+
+        if (entity.getCreneauDisponibilite() != null) {
+            dto.setCreneauDisponibiliteId(entity.getCreneauDisponibilite().getId());
+        }
 
         return dto;
     }
@@ -34,8 +38,9 @@ public class CreneauConverter {
         entity.setDateCreneau(dto.getDateCreneau());
         entity.setHeureDebut(dto.getHeureDebut());
         entity.setHeureFin(dto.getHeureFin());
-        entity.setCapaciteRestante(dto.getCapaciteRestante());
+        entity.setCapaciteMax(dto.getCapaciteMax());
         entity.setActif(dto.getActif());
+
 
         return entity;
     }

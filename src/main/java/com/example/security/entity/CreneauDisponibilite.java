@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.List;
+
 @Entity
 @Table(name = "creneaux_disponibile")
 @Data
@@ -27,4 +29,6 @@ public class CreneauDisponibilite {
     private Boolean actif = true;
     @Column(name = "cree_par_admin")
     private Boolean creeParAdmin = false;
+    @OneToMany(mappedBy = "creneauDisponibilite", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Creneau> creneaux;
 }

@@ -7,10 +7,8 @@ import java.util.List;
 
 public interface CreneauRepository extends JpaRepository<Creneau, Long> {
     List<Creneau> findByDateCreneauAndActifTrue(LocalDate dateCreneau);
-    List<Creneau> findByDateCreneauAndActifTrueAndCapaciteRestanteGreaterThan(LocalDate date, int i);
+    List<Creneau> findByDateCreneauAndActifTrueAndCapaciteMaxGreaterThan(LocalDate date, int i);
     boolean existsByDateCreneauAndHeureDebutAndHeureFin(LocalDate date, LocalTime heureDebut, LocalTime heureFin);
-    List<Creneau> findByCreneauDisponibiliteIdAndDateCreneauAfter(Long creneauDisponibiliteId, LocalDate aujourdhui);
-    List<Creneau> findByDateCreneauAfterAndCapaciteRestanteGreaterThan(LocalDate aujourdhui, int i);
+    List<Creneau> findByDateCreneauAfterAndCapaciteMaxGreaterThan(LocalDate aujourdhui, int i);
     List<Creneau> findByDateCreneauBefore(LocalDate dateLimit);
-
 }
