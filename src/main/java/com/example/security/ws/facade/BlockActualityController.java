@@ -55,9 +55,22 @@ public class BlockActualityController {
         try {
             BlockActuality actualite = converter.map(dto);
 
+            // Si une nouvelle image est uploadée, la stocker
             if (imageFile != null && !imageFile.isEmpty()) {
                 String filename = blockActualityService.storeImage(imageFile);
                 actualite.setImageUrl("/images/" + filename);
+            } else {
+                // Si aucune nouvelle image n'est uploadée, récupérer l'actualité existante
+                Optional<BlockActuality> existante = blockActualityService.getActualiteById(id);
+                if (existante.isPresent()) {
+                    // Si le DTO a une imageUrl null ou vide, cela signifie qu'on veut supprimer l'image
+                    if (dto.getImageUrl() == null || dto.getImageUrl().isEmpty()) {
+                        actualite.setImageUrl(null); // Cela déclenchera la suppression dans le service
+                    } else {
+                        // Sinon, garder l'image existante
+                        actualite.setImageUrl(existante.get().getImageUrl());
+                    }
+                }
             }
 
             BlockActuality updated = blockActualityService.modifierActualite(id, actualite);

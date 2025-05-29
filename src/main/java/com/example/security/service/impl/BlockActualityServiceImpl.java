@@ -25,6 +25,19 @@ public class BlockActualityServiceImpl implements BlockActualityService {
     @Value("${app.upload.dir:${user.home}/uploads/images}")
     private String uploadDir;
 
+    private void deleteImage(String imageUrl) {
+        if (imageUrl != null && !imageUrl.isEmpty()) {
+            String filename = imageUrl.replace("/images/", "");
+            Path imagePath = Paths.get(uploadDir).resolve(filename);
+            try {
+                Files.deleteIfExists(imagePath);
+                System.out.println("Image supprimée : " + imagePath);
+            } catch (IOException e) {
+                System.err.println("Erreur lors de la suppression de l'image : " + imagePath + " - " + e.getMessage());
+            }
+        }
+    }
+
     @Autowired
     public BlockActualityServiceImpl(BlockActualityRepository actualitesRepository) {
         this.blockActualityRepository = actualitesRepository;
@@ -41,21 +54,29 @@ public class BlockActualityServiceImpl implements BlockActualityService {
         if (existante.isPresent()) {
             BlockActuality aModifier = existante.get();
 
+            String ancienneImageUrl = aModifier.getImageUrl();
+
             aModifier.setTitre(actualite.getTitre());
             aModifier.setIntroduction(actualite.getIntroduction());
             aModifier.setAuteur(actualite.getAuteur());
             aModifier.setCategorie(actualite.getCategorie());
-            aModifier.setImageUrl(actualite.getImageUrl());
+
+            if (actualite.getImageUrl() != null) {
+                aModifier.setImageUrl(actualite.getImageUrl());
+                // Supprimer l'ancienne image si elle est différente de la nouvelle
+                if (ancienneImageUrl != null && !ancienneImageUrl.equals(actualite.getImageUrl())) {
+                    deleteImage(ancienneImageUrl);
+                }
+            }
+
             aModifier.setSlug(actualite.getSlug());
             aModifier.setDatePublication(actualite.getDatePublication());
             aModifier.setStatut(actualite.getStatut());
             aModifier.setConclusion(actualite.getConclusion());
-
             aModifier.setTags(actualite.getTags());
 
             if (actualite.getSections() != null) {
                 aModifier.getSections().clear();
-
                 for (BlogSection section : actualite.getSections()) {
                     section.setBlockActuality(aModifier);
                     aModifier.getSections().add(section);
@@ -71,7 +92,16 @@ public class BlockActualityServiceImpl implements BlockActualityService {
 
     @Override
     public void supprimerActualite(Long id) {
-        blockActualityRepository.deleteById(id);
+        Optional<BlockActuality> actualiteOpt = blockActualityRepository.findById(id);
+        if (actualiteOpt.isPresent()) {
+            BlockActuality actualite = actualiteOpt.get();
+
+            deleteImage(actualite.getImageUrl());
+
+            blockActualityRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Article introuvable avec l'id : " + id);
+        }
     }
 
     @Override
@@ -97,7 +127,6 @@ public class BlockActualityServiceImpl implements BlockActualityService {
 
         String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
 
-        // Copier le fichier dans le répertoire cible
         Path filePath = uploadPath.resolve(filename);
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 

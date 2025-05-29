@@ -68,7 +68,8 @@ public class SecurityConfig {
                                 "/temoignages",
                                 "/admin/**",
                                 "/etudiants/admin",
-                                        "/etudiants/admin/**"
+                                        "/etudiants/admin/**",
+                                        "/images/**"
 
 
                                         ).permitAll()
