@@ -4,15 +4,15 @@ import java.util.List;
 
  public interface CreneauService {
 
-    Creneau save(Creneau creneau);             // Créer ou modifier un créneau
 
-    Creneau findById(Long id);                  // Chercher un créneau par son id
 
+     Creneau findById(Long id);                  // Chercher un créneau par son id
     List<Creneau> findAll();                    // Lister tous les créneaux
-
     boolean isCreneauAvailable(Long creneauId);// Vérifier disponibilité d’un créneau
 
-    Creneau reserverCreneau(Long creneauId);   // Réserver un créneau
+     Creneau reserverCreneau(Long creneauId);
 
-    Creneau libererCreneau(Long creneauId);    // Libérer un créneau réservé
-}
+
+
+     List<Creneau> findAllActiveCreneaux();
+ }

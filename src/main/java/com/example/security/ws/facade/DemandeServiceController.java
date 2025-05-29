@@ -1,5 +1,4 @@
 package com.example.security.ws.facade;
-
 import com.example.security.entity.DemandeService;
 import com.example.security.service.facade.CreneauService;
 import com.example.security.service.facade.DemandeServiceService;
@@ -10,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-
-
 @RestController
 @RequestMapping("/demandesService")
 public class DemandeServiceController {

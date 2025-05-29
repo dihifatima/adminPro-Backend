@@ -4,7 +4,7 @@ import com.example.security.Authentification.user.User;
 import com.example.security.Authentification.user.UserRepository;
 import com.example.security.dao.DemandeServiceRepository;
 import com.example.security.dao.ServiceOffertRepository;
-import com.example.security.dao.CreneauRepository; // Ajout
+import com.example.security.dao.GenerationCreneauxParDefautRepository; // Ajout
 import com.example.security.entity.Creneau;
 import com.example.security.entity.DemandeService;
 import com.example.security.entity.Etudiant;
@@ -15,8 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,24 +24,18 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
 
 
     private final DemandeServiceRepository demandeServiceRepository;
-
     private final UserRepository userRepository;
-
     private final ServiceOffertRepository serviceOffertRepository;
-
     private final CreneauService creneauService;
-
-    private final CreneauRepository creneauRepository; // Ajout
-
+    private final GenerationCreneauxParDefautRepository creneauRepository; // Ajout
     private final JwtService jwtService;
-
     private final HttpServletRequest request;
 
     public DemandeServiceServiceImpl(DemandeServiceRepository demandeServiceRepository,
                                      UserRepository userRepository,
                                      ServiceOffertRepository serviceOffertRepository,
                                      CreneauService creneauService,
-                                     CreneauRepository creneauRepository, // Ajout
+                                     GenerationCreneauxParDefautRepository creneauRepository, // Ajout
                                      JwtService jwtService,
                                      HttpServletRequest request) {
         this.demandeServiceRepository = demandeServiceRepository;
@@ -65,10 +57,6 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
 
         // Déterminer le service offert
         ServiceOffert serviceOffert = determineServiceOffert(user);
-
-
-
-
         // Vérifier et réserver le créneau si spécifié
         Creneau creneau = null;
         if (creneauId != null) {
@@ -96,10 +84,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
         if (demande == null || demande.getId() == null) {
             throw new RuntimeException("DemandeService ou son ID ne peut pas être null");
         }
-
         DemandeService existing = findByRef(demande.getRef());
-
-
         // Mise à jour des champs modifiables
         existing.setCreneau(demande.getCreneau());
         existing.setStatut(demande.getStatut());
@@ -111,53 +96,6 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
 
         return demandeServiceRepository.save(existing);
     }
-
-
-
-    private Creneau findAvailableCreneauForDateTime(LocalDateTime dateRendezvous) {
-        if (dateRendezvous == null) {
-            return null;
-        }
-
-        LocalDate date = dateRendezvous.toLocalDate();
-        LocalTime heure = dateRendezvous.toLocalTime();
-
-        List<Creneau> creneauxDuJour = creneauRepository.findByDateCreneauAndActifTrue(date);
-
-        for (Creneau creneau : creneauxDuJour) {
-            if (creneau.getHeureDebut() != null && creneau.getHeureFin() != null) {
-                if ((heure.equals(creneau.getHeureDebut()) || heure.isAfter(creneau.getHeureDebut())) &&
-                        heure.isBefore(creneau.getHeureFin()) &&
-                        creneau.getCapaciteMax() > 0) {
-                    return creneau;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private boolean isCreneauCompatibleWithDate(Creneau creneau, LocalDateTime dateRendezvous) {
-        if (creneau == null || dateRendezvous == null) {
-            return false;
-        }
-
-        LocalDate dateRdv = dateRendezvous.toLocalDate();
-        LocalTime heureRdv = dateRendezvous.toLocalTime();
-
-        if (!creneau.getDateCreneau().equals(dateRdv)) {
-            return false;
-        }
-
-        return (heureRdv.equals(creneau.getHeureDebut()) || heureRdv.isAfter(creneau.getHeureDebut())) &&
-                heureRdv.isBefore(creneau.getHeureFin());
-    }
-
-    public List<Creneau> getAvailableCreneauxForDate(LocalDate date) {
-        return creneauRepository.findByDateCreneauAndActifTrueAndCapaciteMaxGreaterThan(date, 0);
-    }
-
-
 
     @Override
     public DemandeService findByRef(String ref) {
@@ -172,15 +110,12 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
     public List<DemandeService> findAll() {
         return demandeServiceRepository.findAll();
     }
-
-
     @Override
     public int deleteByRef(String ref) {
         DemandeService demande = findByRef(ref);
         demandeServiceRepository.delete(demande);
         return 1;
     }
-
     @Override
     public DemandeService updateStatut(String ref, String nouveauStatut) {
         DemandeService demande = findByRef(ref);

@@ -1,7 +1,7 @@
 package com.example.security.service.impl;
 import com.example.security.dao.CreneauDisponibiliteRepository;
 import com.example.security.entity.CreneauDisponibilite;
-import com.example.security.service.facade.CreneauDisponibiliteService;
+import com.example.security.service.facade.ParametrageCreneauDisponibiliteService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,38 +12,14 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteService {
+public class ParametrageCreneauxDisponibiliteServiceImpl implements ParametrageCreneauDisponibiliteService {
 
     @Autowired
     private final CreneauDisponibiliteRepository creneauDisponibiliteRepository;
-    public CreneauDisponibiliteServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository) {
+    public ParametrageCreneauxDisponibiliteServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository) {
         this.creneauDisponibiliteRepository = creneauDisponibiliteRepository;
     }
 
-    @Override
-    public CreneauDisponibilite save(CreneauDisponibilite creneauDisponibilite) {
-        validateCreneauDisponibilite(creneauDisponibilite);
-        // Vérifier les chevauchements avant la sauvegarde
-        if (hasTimeConflict(creneauDisponibilite)) {
-            throw new IllegalArgumentException(
-                    "Un créneau existe déjà pour ce jour et ces horaires : " +
-                            creneauDisponibilite.getJourSemaine() + " " +
-                            creneauDisponibilite.getHeureDebut() + "-" + creneauDisponibilite.getHeureFin()
-            );
-        }
-        CreneauDisponibilite saved = creneauDisponibiliteRepository.save(creneauDisponibilite);
-        return saved;
-    }
-    private boolean hasTimeConflict(CreneauDisponibilite creneau) {
-        List<CreneauDisponibilite> existingCreneaux = creneauDisponibiliteRepository
-                .findByJourSemaineAndActifTrue(creneau.getJourSemaine());
-
-        return existingCreneaux.stream()
-                .anyMatch(existing -> timesOverlap(
-                        creneau.getHeureDebut(), creneau.getHeureFin(),
-                        existing.getHeureDebut(), existing.getHeureFin()
-                ));
-    }
 
     @Override
     public CreneauDisponibilite update(CreneauDisponibilite creneauDisponibilite) {
@@ -174,40 +150,6 @@ public class CreneauDisponibiliteServiceImpl implements CreneauDisponibiliteServ
     private boolean timesOverlap(LocalTime start1, LocalTime end1, LocalTime start2, LocalTime end2) {
         return start1.isBefore(end2) && start2.isBefore(end1);
     }
-    Optional<CreneauDisponibilite> findByIdOptional(Long id) {
-        if (id == null) {
-            return Optional.empty();
-        }
-        return creneauDisponibiliteRepository.findById(id);
-    }
 
-    public long countAll() {
-        return creneauDisponibiliteRepository.count();
-    }
 
-    public long countActive() {
-        return creneauDisponibiliteRepository.countByActifTrue();
-    }
-
-    public List<CreneauDisponibilite> findAllByJourSemaine(DayOfWeek jourSemaine) {
-        if (jourSemaine == null) {
-            throw new IllegalArgumentException("Le jour de la semaine ne peut pas être null");
-        }
-        return creneauDisponibiliteRepository.findByJourSemaine(jourSemaine);
-    }
-
-    @Transactional
-    public int toggleDayAvailability(DayOfWeek jourSemaine, boolean actif) {
-        if (jourSemaine == null) {
-            throw new IllegalArgumentException("Le jour de la semaine ne peut pas être null");
-        }
-
-        List<CreneauDisponibilite> creneauxDuJour = findAllByJourSemaine(jourSemaine);
-
-        for (CreneauDisponibilite creneau : creneauxDuJour) {
-            creneau.setActif(actif);
-        }
-        creneauDisponibiliteRepository.saveAll(creneauxDuJour);
-        return creneauxDuJour.size();
-    }
 }

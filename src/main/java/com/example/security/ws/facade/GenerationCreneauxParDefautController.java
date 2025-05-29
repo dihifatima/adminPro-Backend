@@ -1,50 +1,41 @@
 package com.example.security.ws.facade;
-
+import com.example.security.entity.Creneau;
 import com.example.security.entity.CreneauDisponibilite;
-import com.example.security.service.facade.CreneauDisponibiliteService;
-import com.example.security.service.facade.CreneauGenerationService;
+import com.example.security.service.facade.ParametrageCreneauDisponibiliteService;
+import com.example.security.service.facade.GenerationCreneauxParDefautService;
+import com.example.security.service.facade.CreneauService;
+import com.example.security.ws.converter.CreneauConverter;
 import com.example.security.ws.converter.CreneauDisponibiliteConverter;
 import com.example.security.ws.dto.CreneauDisponibiliteDto;
+import com.example.security.ws.dto.CreneauDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 @RestController
 @RequestMapping("/creneaux-gestion")
-public class CreneauxParDefautController {
-
-    private final CreneauDisponibiliteService creneauDisponibiliteService;
-    private final CreneauGenerationService creneauGenerationService;
+public class GenerationCreneauxParDefautController {
+    private final ParametrageCreneauDisponibiliteService creneauDisponibiliteService;
+    private final GenerationCreneauxParDefautService generationCreneauxParDefautService;
     private final CreneauDisponibiliteConverter creneauDisponibiliteConverter;
-
-    public CreneauxParDefautController(CreneauDisponibiliteService creneauDisponibiliteService,
-                                       CreneauGenerationService creneauGenerationService,
-                                       CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
+    private final CreneauConverter creneauConverter;
+    private final CreneauService creneauService;
+    public GenerationCreneauxParDefautController(ParametrageCreneauDisponibiliteService creneauDisponibiliteService,
+                                                 GenerationCreneauxParDefautService generationCreneauxParDefautService,
+                                                 CreneauDisponibiliteConverter creneauDisponibiliteConverter, CreneauConverter creneauConverter, CreneauService creneauService) {
         this.creneauDisponibiliteService = creneauDisponibiliteService;
-        this.creneauGenerationService = creneauGenerationService;
+        this.generationCreneauxParDefautService = generationCreneauxParDefautService;
         this.creneauDisponibiliteConverter = creneauDisponibiliteConverter;
+        this.creneauConverter = creneauConverter;
+        this.creneauService = creneauService;
     }
 
-    @PostMapping("/initialize-default")
-    public ResponseEntity<?> initializeDefaultCreneaux() {
-        try {
-            creneauGenerationService.initializeDefaultCreneauxDisponibilite();
-            return ResponseEntity.ok("Créneaux par défaut initialisés avec succès");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors de l'initialisation : " + e.getMessage());
-        }
-    }
-
-    // ✅ NOUVEAU : Endpoint pour générer les créneaux futurs
     @PostMapping("/generate-future")
     public ResponseEntity<?> generateFutureCreneaux() {
         try {
-            creneauGenerationService.generateFutureCreneaux();
+            generationCreneauxParDefautService.generateFutureCreneaux();
             return ResponseEntity.ok("Créneaux futurs générés avec succès");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -60,11 +51,9 @@ public class CreneauxParDefautController {
                 creneauDisponibiliteService.deleteById(creneau.getId());
             }
 
-            creneauGenerationService.initializeDefaultCreneauxDisponibilite();
-            creneauGenerationService.regenerateAllFutureCreneaux();
-
-            // ✅ AJOUT : Générer les créneaux après reset
-            creneauGenerationService.generateFutureCreneaux();
+            generationCreneauxParDefautService.initializeDefaultCreneauxDisponibilite();
+            generationCreneauxParDefautService.regenerateAllFutureCreneaux();
+            generationCreneauxParDefautService.generateFutureCreneaux();
 
             return ResponseEntity.ok("Système réinitialisé aux créneaux par défaut");
         } catch (Exception e) {
@@ -76,7 +65,7 @@ public class CreneauxParDefautController {
     @PostMapping("/cleanup-past")
     public ResponseEntity<?> cleanupPastCreneaux() {
         try {
-            creneauGenerationService.cleanupPastCreneaux();
+            generationCreneauxParDefautService.cleanupPastCreneaux();
             return ResponseEntity.ok("Créneaux passés nettoyés");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -121,4 +110,30 @@ public class CreneauxParDefautController {
                     .body("Erreur lors de la récupération des créneaux : " + e.getMessage());
         }
     }
+    @GetMapping("/disponibles")
+    public ResponseEntity<List<CreneauDto>> getCreneauxDisponibles() {
+        try {
+            // Récupérer tous les créneaux actifs depuis la base de données
+            List<Creneau> creneauxActifs = creneauService.findAllActiveCreneaux();
+
+            // Convertir en DTO pour le frontend
+            List<CreneauDto> creneauxDto = creneauConverter.mapListEntities(creneauxActifs);
+
+            return ResponseEntity.ok(creneauxDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+       /* @PostMapping("/initialize-default")
+    public ResponseEntity<?> initializeDefaultCreneaux() {
+        try {
+            creneauGenerationService.initializeDefaultCreneauxDisponibilite();
+            return ResponseEntity.ok("Créneaux par défaut initialisés avec succès");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de l'initialisation : " + e.getMessage());
+        }
+    }*/
+
 }

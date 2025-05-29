@@ -1,13 +1,11 @@
 package com.example.security.service.impl;
-
 import com.example.security.dao.CreneauDisponibiliteRepository;
-import com.example.security.dao.CreneauRepository;
+import com.example.security.dao.GenerationCreneauxParDefautRepository;
 import com.example.security.entity.Creneau;
 import com.example.security.entity.CreneauDisponibilite;
-import com.example.security.service.facade.CreneauGenerationService;
+import com.example.security.service.facade.GenerationCreneauxParDefautService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -16,13 +14,12 @@ import java.util.List;
 
 @Service
 @Transactional
-public class CreneauGenerationServiceImpl implements CreneauGenerationService {
+public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneauxParDefautService {
 
     private final CreneauDisponibiliteRepository creneauDisponibiliteRepository;
-    private final CreneauRepository creneauRepository;
+    private final GenerationCreneauxParDefautRepository creneauRepository;
 
-    public CreneauGenerationServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository,
-                                        CreneauRepository creneauRepository) {
+    public GenerationCreneauxParDefautServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository, GenerationCreneauxParDefautRepository creneauRepository) {
         this.creneauDisponibiliteRepository = creneauDisponibiliteRepository;
         this.creneauRepository = creneauRepository;
     }
