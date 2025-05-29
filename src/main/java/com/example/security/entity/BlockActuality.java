@@ -1,13 +1,10 @@
 package com.example.security.entity;
-
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-
 @Data
 @EqualsAndHashCode(exclude = {"sections"})
 @ToString(exclude = {"sections"})

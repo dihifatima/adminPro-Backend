@@ -4,7 +4,6 @@ import com.example.security.entity.Particulier;
 import com.example.security.service.facade.ParticulierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;

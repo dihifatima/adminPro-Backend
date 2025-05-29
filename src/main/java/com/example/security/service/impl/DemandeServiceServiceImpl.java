@@ -1,41 +1,145 @@
 package com.example.security.service.impl;
-
 import com.example.security.Authentification.security.JwtService;
 import com.example.security.Authentification.user.User;
 import com.example.security.Authentification.user.UserRepository;
 import com.example.security.dao.DemandeServiceRepository;
 import com.example.security.dao.ServiceOffertRepository;
+import com.example.security.dao.GenerationCreneauxParDefautRepository; // Ajout
+import com.example.security.entity.Creneau;
 import com.example.security.entity.DemandeService;
 import com.example.security.entity.Etudiant;
 import com.example.security.entity.ServiceOffert;
+import com.example.security.service.facade.CreneauService;
 import com.example.security.service.facade.DemandeServiceService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class DemandeServiceServiceImpl implements DemandeServiceService {
+
 
     private final DemandeServiceRepository demandeServiceRepository;
     private final UserRepository userRepository;
     private final ServiceOffertRepository serviceOffertRepository;
+    private final CreneauService creneauService;
+    private final GenerationCreneauxParDefautRepository creneauRepository; // Ajout
     private final JwtService jwtService;
     private final HttpServletRequest request;
 
-    public DemandeServiceServiceImpl(DemandeServiceRepository demandeServiceRepository, UserRepository userRepository, ServiceOffertRepository serviceOffertRepository, JwtService jwtService, HttpServletRequest request) {
+    public DemandeServiceServiceImpl(DemandeServiceRepository demandeServiceRepository,
+                                     UserRepository userRepository,
+                                     ServiceOffertRepository serviceOffertRepository,
+                                     CreneauService creneauService,
+                                     GenerationCreneauxParDefautRepository creneauRepository, // Ajout
+                                     JwtService jwtService,
+                                     HttpServletRequest request) {
         this.demandeServiceRepository = demandeServiceRepository;
         this.userRepository = userRepository;
         this.serviceOffertRepository = serviceOffertRepository;
+        this.creneauService = creneauService;
+        this.creneauRepository = creneauRepository; // Ajout
         this.jwtService = jwtService;
         this.request = request;
     }
+    @Override
+    public DemandeService saveAvecCreneau(DemandeService demande, Long creneauId) {
+        if (demande == null) {
+            throw new RuntimeException("DemandeService ne peut pas être null");
+        }
+
+        // Extraire le token et récupérer l'utilisateur
+        User user = getCurrentUser();
+
+        // Déterminer le service offert
+        ServiceOffert serviceOffert = determineServiceOffert(user);
+        // Vérifier et réserver le créneau si spécifié
+        Creneau creneau = null;
+        if (creneauId != null) {
+            if (!creneauService.isCreneauAvailable(creneauId)) {
+                throw new RuntimeException("Le créneau sélectionné n'est pas disponible");
+            }
+            creneau = creneauService.reserverCreneau(creneauId);
+        }
+
+        // Construire la nouvelle demande
+        DemandeService newDemande = new DemandeService();
+        newDemande.setRef(generateReference());
+        newDemande.setDateSoumission(LocalDateTime.now());
+        newDemande.setStatut("EN_ATTENTE");
+        newDemande.setUser(user);
+        newDemande.setServiceOffert(serviceOffert);
+        newDemande.setCreneau(creneau);
+
+        return demandeServiceRepository.save(newDemande);
+    }
+
 
     @Override
-    public DemandeService save(DemandeService demande) {
-        // 1. Extraire le token depuis l'en-tête Authorization
+    public DemandeService update(DemandeService demande) {
+        if (demande == null || demande.getId() == null) {
+            throw new RuntimeException("DemandeService ou son ID ne peut pas être null");
+        }
+        DemandeService existing = findByRef(demande.getRef());
+        // Mise à jour des champs modifiables
+        existing.setCreneau(demande.getCreneau());
+        existing.setStatut(demande.getStatut());
+
+        // **CORRECTION 2** : Mettre à jour le créneau si la date/heure change
+        if (demande.getCreneau() != null) {
+            existing.setCreneau(demande.getCreneau());
+        }
+
+        return demandeServiceRepository.save(existing);
+    }
+
+    @Override
+    public DemandeService findByRef(String ref) {
+        DemandeService demande = demandeServiceRepository.findByRef(ref);
+        if (demande == null) {
+            throw new RuntimeException("DemandeService non trouvée avec la référence : " + ref);
+        }
+        return demande;
+    }
+
+    @Override
+    public List<DemandeService> findAll() {
+        return demandeServiceRepository.findAll();
+    }
+    @Override
+    public int deleteByRef(String ref) {
+        DemandeService demande = findByRef(ref);
+        demandeServiceRepository.delete(demande);
+        return 1;
+    }
+    @Override
+    public DemandeService updateStatut(String ref, String nouveauStatut) {
+        DemandeService demande = findByRef(ref);
+        demande.setStatut(nouveauStatut);
+        return demandeServiceRepository.save(demande);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Méthodes privées utilitaires inchangées...
+    private User getCurrentUser() {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new RuntimeException("Token non fourni");
@@ -44,90 +148,20 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
         String jwt = authHeader.substring(7);
         String userEmail = jwtService.extractUsername(jwt);
 
-        // 2. Récupérer l'utilisateur connecté
-        User user = userRepository.findByEmail(userEmail)
+        return userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    }
 
-        // 3. Déterminer le service offert (exemple pour Étudiant)
-        ServiceOffert serviceOffert;
+    private ServiceOffert determineServiceOffert(User user) {
         if (user instanceof Etudiant) {
-            serviceOffert = serviceOffertRepository.findById(1L)
+            return serviceOffertRepository.findById(1L)
                     .orElseThrow(() -> new RuntimeException("Service orientation académique introuvable"));
         } else {
             throw new RuntimeException("Type de client non supporté pour le moment");
         }
-
-        // 4. Vérifier s'il existe déjà une demande pour ce user + ce service
-        DemandeService existing = demandeServiceRepository.findByUser_EmailAndServiceOffert_Name(
-                user.getEmail(), serviceOffert.getName());
-
-        if (existing != null) {
-            throw new RuntimeException("Une demande existe déjà pour ce service.");
-        }
-
-        // 5. Construire une nouvelle instance de DemandeService
-        DemandeService newDemande = new DemandeService();
-        newDemande.setRef(UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-        newDemande.setDateRendezvous(demande.getDateRendezvous());
-        newDemande.setDateSoumission(LocalDateTime.now());
-        newDemande.setStatut("EN_ATTENTE");
-        newDemande.setUser(user);
-        newDemande.setServiceOffert(serviceOffert);
-
-        // 6. Sauvegarde
-        return demandeServiceRepository.save(newDemande);
     }
 
-    @Override
-    public DemandeService updateStatut(String ref, String nouveauStatut) {
-        // Chercher la demande par la référence (ref)
-        DemandeService demande = demandeServiceRepository.findByRef(ref);
-        if (demande != null) {
-            // Mettre à jour le statut de la demande
-            demande.setStatut(nouveauStatut);
-            return demandeServiceRepository.save(demande); // Sauvegarder la demande mise à jour
-        } else {
-            throw new RuntimeException("Demande non trouvée pour la référence : " + ref);
-        }
-    }
-
-    @Override
-    public DemandeService findByRef(String ref) {
-        // Chercher la demande par la référence (ref)
-        return demandeServiceRepository.findByRef(ref);
-    }
-
-    @Override
-    public int deleteByRef(String ref) {
-        // Vérifier si la demande existe
-        DemandeService demande = demandeServiceRepository.findByRef(ref);
-        if (demande != null) {
-            // Supprimer la demande et retourner le nombre d'éléments supprimés
-            demandeServiceRepository.delete(demande);
-            return 1; // 1 élément supprimé
-        } else {
-            throw new RuntimeException("Demande non trouvée pour la référence : " + ref);
-        }
-    }
-
-    @Override
-    public List<DemandeService> findAll() {
-        // Retourner toutes les demandes
-        return demandeServiceRepository.findAll();
-    }
-    public List<LocalDateTime> findAllReservedDates() {
-        return demandeServiceRepository.findAllReservedDates();
-    }
-
-
-    @Override
-    public List<DemandeService> findByUserFullName(String userNom) {
-        return demandeServiceRepository.findByUserFullName(userNom);
-    }
-
-    @Override
-    public List<DemandeService> findByServiceOffertNom(String serviceOffertNom) {
-        // Updated to use the corrected repository method
-        return demandeServiceRepository.findByServiceOffert_Name(serviceOffertNom);
+    private String generateReference() {
+        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }

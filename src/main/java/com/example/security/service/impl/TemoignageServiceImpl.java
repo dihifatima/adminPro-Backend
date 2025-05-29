@@ -1,5 +1,4 @@
 package com.example.security.service.impl;
-
 import com.example.security.dao.TemoignageRepository;
 import com.example.security.entity.Temoignage;
 import com.example.security.service.facade.TemoignageService;
@@ -8,6 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public class TemoignageServiceImpl implements TemoignageService {
+
     private  final TemoignageRepository temoignageRepository;
 
     public TemoignageServiceImpl(TemoignageRepository temoignageRepository) {
@@ -19,7 +19,7 @@ public class TemoignageServiceImpl implements TemoignageService {
         return temoignageRepository.save(temoignage);
     }
 
-    // Récupérer tous les témoignages
+
     @Override
     public List<Temoignage> getAllTemoignages() {
         return temoignageRepository.findAll();

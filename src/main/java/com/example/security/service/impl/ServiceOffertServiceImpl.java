@@ -16,7 +16,6 @@ public class ServiceOffertServiceImpl implements ServiceOffertService {
 
     private final ServiceOffertRepository serviceOffertRepository;
 
-    @Autowired
     public ServiceOffertServiceImpl(ServiceOffertRepository serviceOffertRepository) {
         this.serviceOffertRepository = serviceOffertRepository;
     }

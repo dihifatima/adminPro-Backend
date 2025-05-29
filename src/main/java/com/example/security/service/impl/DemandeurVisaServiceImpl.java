@@ -1,5 +1,4 @@
 package com.example.security.service.impl;
-
 import com.example.security.dao.DemandeurVisaRepository;
 import com.example.security.entity.DemandeurVisa;
 import com.example.security.service.facade.DemandeurVisaService;
@@ -10,8 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 @Service
 public class DemandeurVisaServiceImpl implements DemandeurVisaService {
-    @Autowired
+
     private final DemandeurVisaRepository demandeurVisaRepository;
+
     public DemandeurVisaServiceImpl(DemandeurVisaRepository porteVisaRepository, DemandeurVisaRepository demandeurVisaRepository) {
         this.demandeurVisaRepository = demandeurVisaRepository;
     }
