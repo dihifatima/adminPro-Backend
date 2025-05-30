@@ -17,4 +17,5 @@ public class CreneauDto {
     private Boolean actif;
     private Long creneauDisponibiliteId; // ID seulement si tu ne veux pas tout l'objet
     private List<Long> demandes; // Liste d'IDs des DemandeService associés
+
 }
