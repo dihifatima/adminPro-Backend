@@ -9,4 +9,5 @@ public interface ServiceOffertRepository extends JpaRepository<ServiceOffert, Lo
     void deleteById(Long id);
 
 
+
 }
