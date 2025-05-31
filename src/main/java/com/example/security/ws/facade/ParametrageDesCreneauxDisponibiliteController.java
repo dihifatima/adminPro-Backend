@@ -14,12 +14,12 @@ import java.util.List;
 @RequestMapping("/creneaux-disponibilite")
 public class ParametrageDesCreneauxDisponibiliteController {
 
-    private final ParametrageCreneauDisponibiliteService creneauDisponibiliteService;
+    private final ParametrageCreneauDisponibiliteService parametrageCreneauDisponibiliteService;
 
     private  final CreneauDisponibiliteConverter creneauDisponibiliteConverter;
 
     public ParametrageDesCreneauxDisponibiliteController(ParametrageCreneauDisponibiliteService creneauDisponibiliteService, CreneauDisponibiliteConverter creneauDisponibiliteConverter) {
-        this.creneauDisponibiliteService = creneauDisponibiliteService;
+        this.parametrageCreneauDisponibiliteService = creneauDisponibiliteService;
         this.creneauDisponibiliteConverter = creneauDisponibiliteConverter;
     }
 
@@ -27,7 +27,7 @@ public class ParametrageDesCreneauxDisponibiliteController {
     public ResponseEntity<?> update(@Valid @RequestBody CreneauDisponibiliteDto dto) {
         try {
             CreneauDisponibilite entity = creneauDisponibiliteConverter.map(dto);
-            CreneauDisponibilite updated = creneauDisponibiliteService.update(entity);
+            CreneauDisponibilite updated = parametrageCreneauDisponibiliteService.update(entity);
             CreneauDisponibiliteDto updatedDto = creneauDisponibiliteConverter.map(updated);
             return ResponseEntity.ok(updatedDto);
         } catch (RuntimeException e) {
@@ -42,7 +42,7 @@ public class ParametrageDesCreneauxDisponibiliteController {
 //hadi kat3ti ghir les crenaux no date
     @GetMapping("/all")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getAll() {
-        List<CreneauDisponibilite> entities = creneauDisponibiliteService.findAll();
+        List<CreneauDisponibilite> entities = parametrageCreneauDisponibiliteService.findAll();
         List<CreneauDisponibiliteDto> dtos = creneauDisponibiliteConverter.mapListEntities(entities);
         return ResponseEntity.ok(dtos);
     }
@@ -51,15 +51,16 @@ public class ParametrageDesCreneauxDisponibiliteController {
 // pour voir planing de jour-http://localhost:8080/api/v1/creneaux-disponibilite/jour/MONDAY
     @GetMapping("/jour/{jour}")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getByJour(@PathVariable DayOfWeek jour) {
-        List<CreneauDisponibilite> entities = creneauDisponibiliteService.findByJourSemaine(jour);
+        List<CreneauDisponibilite> entities = parametrageCreneauDisponibiliteService.findByJourSemaine(jour);
         List<CreneauDisponibiliteDto> dtos = creneauDisponibiliteConverter.mapListEntities(entities);
         return ResponseEntity.ok(dtos);
     }
-
+// pour ramadan bache i hyde dok heure libegha ????
+    
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteById(@PathVariable Long id) {
         try {
-            int deleted = creneauDisponibiliteService.deleteById(id);
+            int deleted = parametrageCreneauDisponibiliteService.deleteById(id);
             return ResponseEntity.ok("Le créneau de disponibilité avec l'ID " + id + " a été supprimé avec succès.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
