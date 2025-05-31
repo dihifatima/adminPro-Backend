@@ -15,7 +15,6 @@ public class CreneauDisponibiliteDto {
     private LocalTime heureDebut;
     private LocalTime heureFin;
     private Integer capaciteMax;
-    private Integer dureeMinutes;
     private Boolean actif;
     private Boolean creeParAdmin;
 }

@@ -39,7 +39,7 @@ public class ParametrageDesCreneauxDisponibiliteController {
         }
     }
 
-
+//hadi kat3ti ghir les crenaux no date
     @GetMapping("/all")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getAll() {
         List<CreneauDisponibilite> entities = creneauDisponibiliteService.findAll();

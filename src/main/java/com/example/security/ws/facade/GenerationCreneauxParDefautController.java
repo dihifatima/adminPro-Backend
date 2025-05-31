@@ -31,18 +31,6 @@ public class GenerationCreneauxParDefautController {
         this.creneauConverter = creneauConverter;
         this.creneauService = creneauService;
     }
-
-    @PostMapping("/generate-future")
-    public ResponseEntity<?> generateFutureCreneaux() {
-        try {
-            generationCreneauxParDefautService.generateFutureCreneaux();
-            return ResponseEntity.ok("Créneaux futurs générés avec succès");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors de la génération : " + e.getMessage());
-        }
-    }
-
     @PostMapping("/reset-to-default")
     public ResponseEntity<?> resetToDefaultCreneaux() {
         try {
@@ -62,18 +50,32 @@ public class GenerationCreneauxParDefautController {
         }
     }
 
-    @PostMapping("/cleanup-past")
-    public ResponseEntity<?> cleanupPastCreneaux() {
+
+    @GetMapping("/LesCreneauxDisponibles")
+    public ResponseEntity<List<CreneauDto>> getCreneauxDisponibles() {
         try {
-            generationCreneauxParDefautService.cleanupPastCreneaux();
-            return ResponseEntity.ok("Créneaux passés nettoyés");
+            // Récupérer tous les créneaux actifs depuis la base de données
+            List<Creneau> creneauxActifs = creneauService.findAllActiveCreneaux();
+
+            // Convertir en DTO pour le frontend
+            List<CreneauDto> creneauxDto = creneauConverter.mapListEntities(creneauxActifs);
+
+            return ResponseEntity.ok(creneauxDto);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors du nettoyage : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @GetMapping("/view-configuration")
+       /* @PostMapping("/initialize-default")
+    public ResponseEntity<?> initializeDefaultCreneaux() {
+        try {
+            creneauGenerationService.initializeDefaultCreneauxDisponibilite();
+            return ResponseEntity.ok("Créneaux par défaut initialisés avec succès");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur lors de l'initialisation : " + e.getMessage());
+        }
+         @GetMapping("/view-configuration")
     public ResponseEntity<Map<String, Object>> viewCurrentConfiguration() {
         try {
             List<CreneauDisponibilite> allCreneaux = creneauDisponibiliteService.findAll();
@@ -98,7 +100,6 @@ public class GenerationCreneauxParDefautController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-
     @GetMapping("/all")
     public ResponseEntity<?> findAll() {
         try {
@@ -110,30 +111,6 @@ public class GenerationCreneauxParDefautController {
                     .body("Erreur lors de la récupération des créneaux : " + e.getMessage());
         }
     }
-    @GetMapping("/disponibles")
-    public ResponseEntity<List<CreneauDto>> getCreneauxDisponibles() {
-        try {
-            // Récupérer tous les créneaux actifs depuis la base de données
-            List<Creneau> creneauxActifs = creneauService.findAllActiveCreneaux();
-
-            // Convertir en DTO pour le frontend
-            List<CreneauDto> creneauxDto = creneauConverter.mapListEntities(creneauxActifs);
-
-            return ResponseEntity.ok(creneauxDto);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
-       /* @PostMapping("/initialize-default")
-    public ResponseEntity<?> initializeDefaultCreneaux() {
-        try {
-            creneauGenerationService.initializeDefaultCreneauxDisponibilite();
-            return ResponseEntity.ok("Créneaux par défaut initialisés avec succès");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors de l'initialisation : " + e.getMessage());
-        }
     }*/
 
 }

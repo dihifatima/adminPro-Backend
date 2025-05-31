@@ -37,7 +37,7 @@ public class CreneauController {
         List<CreneauDto> dtos = creneauConverter.mapListEntities(entities);
         return ResponseEntity.ok(dtos);
     }
-    // Vérifier disponibilité d’un créneau
+    /*// Vérifier disponibilité d’un créneau
     @GetMapping("/available-check/{id}")
     public ResponseEntity<Boolean> isAvailable(@PathVariable Long id) {
         try {
@@ -46,6 +46,6 @@ public class CreneauController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
         }
-    }
+    }*/
 
 }
