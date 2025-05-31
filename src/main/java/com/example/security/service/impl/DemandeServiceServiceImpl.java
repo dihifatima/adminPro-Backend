@@ -5,16 +5,16 @@ import com.example.security.Authentification.user.UserRepository;
 import com.example.security.dao.DemandeServiceRepository;
 import com.example.security.dao.ServiceOffertRepository;
 import com.example.security.dao.GenerationCreneauxParDefautRepository; // Ajout
-import com.example.security.entity.Creneau;
-import com.example.security.entity.DemandeService;
-import com.example.security.entity.Etudiant;
-import com.example.security.entity.ServiceOffert;
+import com.example.security.entity.*;
 import com.example.security.service.facade.CreneauService;
 import com.example.security.service.facade.DemandeServiceService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,7 +68,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
 
         // Construire la nouvelle demande
         DemandeService newDemande = new DemandeService();
-        newDemande.setRef(generateReference());
+        newDemande.setRef(generateReference(user));
         newDemande.setDateSoumission(LocalDateTime.now());
         newDemande.setStatut("EN_ATTENTE");
         newDemande.setUser(user);
@@ -124,20 +124,6 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // Méthodes privées utilitaires inchangées...
     private User getCurrentUser() {
         String authHeader = request.getHeader("Authorization");
@@ -155,13 +141,51 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
     private ServiceOffert determineServiceOffert(User user) {
         if (user instanceof Etudiant) {
             return serviceOffertRepository.findById(1L)
-                    .orElseThrow(() -> new RuntimeException("Service orientation académique introuvable"));
+                    .orElseThrow(() -> new RuntimeException("Service pour étudiant introuvable"));
+        } else if (user instanceof Entrepreneur) {
+            return serviceOffertRepository.findById(2L)
+                    .orElseThrow(() -> new RuntimeException("Service pour entrepreneur introuvable"));
+        } else if (user instanceof DemandeurVisa) {
+            return serviceOffertRepository.findById(3L)
+                    .orElseThrow(() -> new RuntimeException("Service pour demandeur de visa introuvable"));
+        } else if (user instanceof Particulier) {
+            return serviceOffertRepository.findById(4L)
+                    .orElseThrow(() -> new RuntimeException("Service pour particulier introuvable"));
         } else {
-            throw new RuntimeException("Type de client non supporté pour le moment");
+            throw new RuntimeException("Type de client non supporté");
         }
     }
 
-    private String generateReference() {
-        return UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+
+    private String generateReference(User user) {
+        // Obtenir la date actuelle
+        LocalDate currentDate = LocalDate.now();
+        String datePart = currentDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        // Obtenir le type abrégé du client
+        String clientType;
+        if (user instanceof Etudiant) {
+            clientType = "ETU";
+        } else if (user instanceof Entrepreneur) {
+            clientType = "ENT";
+        } else if (user instanceof Particulier) {
+            clientType = "PAR";
+        } else if (user instanceof DemandeurVisa) {
+            clientType = "POR";
+        } else {
+            throw new RuntimeException("Type de client non supporté");
+        }
+
+        // Obtenir l'ID du client (assure-toi que l'ID n'est pas null)
+        Long id = user.getId();
+        if (id == null) {
+            throw new RuntimeException("ID du client introuvable");
+        }
+
+        String idFormatted = String.format("%04d", id); // ex: 0153
+
+        // Construire la référence
+        return datePart + "-" + clientType + idFormatted;
     }
 }
