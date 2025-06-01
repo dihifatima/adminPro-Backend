@@ -9,5 +9,7 @@ public interface ParametrageCreneauDisponibiliteService {
     List<CreneauDisponibilite> findAll();
     List<CreneauDisponibilite> findByJourSemaine(DayOfWeek jour); //  à ajouter
     int deleteById(Long id);
+    CreneauDisponibilite updateActifStatus(Long id, Boolean actif);
+
 }
 

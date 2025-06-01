@@ -18,7 +18,7 @@ public class CreneauConverter {
         dto.setDateCreneau(entity.getDateCreneau());
         dto.setHeureDebut(entity.getHeureDebut());
         dto.setHeureFin(entity.getHeureFin());
-        dto.setCapaciteMax(entity.getCapaciteMax());
+        dto.setCapaciteRestante(entity.getCapaciteRestante());
         dto.setActif(entity.getActif());
 
         if (entity.getCreneauDisponibilite() != null) {
@@ -38,9 +38,8 @@ public class CreneauConverter {
         entity.setDateCreneau(dto.getDateCreneau());
         entity.setHeureDebut(dto.getHeureDebut());
         entity.setHeureFin(dto.getHeureFin());
-        entity.setCapaciteMax(dto.getCapaciteMax());
+        entity.setCapaciteRestante(dto.getCapaciteRestante());
         entity.setActif(dto.getActif());
-
 
         return entity;
     }
@@ -55,13 +54,14 @@ public class CreneauConverter {
                 .collect(Collectors.toList());
     }
 
+    // Méthode corrigée : convertit List<CreneauDto> vers List<Creneau>
     public List<Creneau> mapListDtos(List<CreneauDto> dtos) {
         if (dtos == null) {
             return null;
         }
 
         return dtos.stream()
-                .map(this::map)
+                .map(this::map) // Utilise map(CreneauDto dto) -> Creneau
                 .collect(Collectors.toList());
     }
 }

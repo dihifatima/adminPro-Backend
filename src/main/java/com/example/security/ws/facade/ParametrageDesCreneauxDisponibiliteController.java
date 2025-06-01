@@ -22,7 +22,7 @@ public class ParametrageDesCreneauxDisponibiliteController {
         this.parametrageCreneauDisponibiliteService = creneauDisponibiliteService;
         this.creneauDisponibiliteConverter = creneauDisponibiliteConverter;
     }
-
+// hada bache ibde creneau kamle
     @PutMapping("/update")
     public ResponseEntity<?> update(@Valid @RequestBody CreneauDisponibiliteDto dto) {
         try {
@@ -39,7 +39,29 @@ public class ParametrageDesCreneauxDisponibiliteController {
         }
     }
 
-//hadi kat3ti ghir les crenaux no date
+    // Modification uniquement du champ 'actif' et aussi si j ai modifier la disponibilite de ce creneuxDisponibilite elle va etre aussi  modifier dans les creneaux liee !!!!!
+    @PutMapping("updateStatuDeCreneau/{id}/actif")
+    public ResponseEntity<?> updateActifStatus(
+            @PathVariable Long id,
+            @RequestParam("value") Boolean actif
+    ) {
+        try {
+            CreneauDisponibilite updated = parametrageCreneauDisponibiliteService.updateActifStatus(id, actif);
+            CreneauDisponibiliteDto updatedDto = creneauDisponibiliteConverter.map(updated);
+            return ResponseEntity.ok(updatedDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Erreur : " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Erreur : " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erreur inattendue : " + e.getMessage());
+        }
+    }
+
+    //hadi kat3ti ghir les crenaux no date
     @GetMapping("/all")
     public ResponseEntity<List<CreneauDisponibiliteDto>> getAll() {
         List<CreneauDisponibilite> entities = parametrageCreneauDisponibiliteService.findAll();

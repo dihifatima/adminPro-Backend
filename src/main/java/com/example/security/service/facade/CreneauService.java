@@ -14,5 +14,11 @@ import java.util.List;
 
 
 
-     List<Creneau> findAllActiveCreneaux();
+     Creneau updateCreneauStatus(Long creneauId, Boolean actif);
+
+     /**
+      * Récupère seulement les créneaux actifs et disponibles
+      */
+     List<Creneau> findAvailableCreneauxForBooking();
+
  }

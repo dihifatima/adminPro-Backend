@@ -4,7 +4,7 @@ import com.example.security.Authentification.user.User;
 import com.example.security.Authentification.user.UserRepository;
 import com.example.security.dao.DemandeServiceRepository;
 import com.example.security.dao.ServiceOffertRepository;
-import com.example.security.dao.GenerationCreneauxParDefautRepository; // Ajout
+import com.example.security.dao.CreneauxRepository; // Ajout
 import com.example.security.entity.*;
 import com.example.security.service.facade.CreneauService;
 import com.example.security.service.facade.DemandeServiceService;
@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -27,7 +26,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
     private final UserRepository userRepository;
     private final ServiceOffertRepository serviceOffertRepository;
     private final CreneauService creneauService;
-    private final GenerationCreneauxParDefautRepository creneauRepository; // Ajout
+    private final CreneauxRepository creneauRepository; // Ajout
     private final JwtService jwtService;
     private final HttpServletRequest request;
 
@@ -35,7 +34,7 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
                                      UserRepository userRepository,
                                      ServiceOffertRepository serviceOffertRepository,
                                      CreneauService creneauService,
-                                     GenerationCreneauxParDefautRepository creneauRepository, // Ajout
+                                     CreneauxRepository creneauRepository, // Ajout
                                      JwtService jwtService,
                                      HttpServletRequest request) {
         this.demandeServiceRepository = demandeServiceRepository;

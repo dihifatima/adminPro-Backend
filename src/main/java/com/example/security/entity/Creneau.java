@@ -32,7 +32,7 @@ public class Creneau {
     private LocalTime heureFin;
 
     @Column(name = "capacite_restante")
-    private Integer capaciteMax ;
+    private Integer capaciteRestante ;
 
     @Column(name = "actif")
     private Boolean actif = true;

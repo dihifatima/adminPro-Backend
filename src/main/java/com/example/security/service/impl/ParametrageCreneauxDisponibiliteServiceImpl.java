@@ -1,11 +1,14 @@
 package com.example.security.service.impl;
 import com.example.security.dao.CreneauDisponibiliteRepository;
+import com.example.security.dao.CreneauxRepository;
+import com.example.security.entity.Creneau;
 import com.example.security.entity.CreneauDisponibilite;
 import com.example.security.service.facade.ParametrageCreneauDisponibiliteService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -16,8 +19,10 @@ public class ParametrageCreneauxDisponibiliteServiceImpl implements ParametrageC
 
     @Autowired
     private final CreneauDisponibiliteRepository creneauDisponibiliteRepository;
-    public ParametrageCreneauxDisponibiliteServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository) {
+    private final CreneauxRepository creneauxRepository;
+    public ParametrageCreneauxDisponibiliteServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository, CreneauxRepository creneauxRepository) {
         this.creneauDisponibiliteRepository = creneauDisponibiliteRepository;
+        this.creneauxRepository = creneauxRepository;
     }
 
 
@@ -70,6 +75,45 @@ public class ParametrageCreneauxDisponibiliteServiceImpl implements ParametrageC
         }
     }
 
+    @Override
+    public CreneauDisponibilite updateActifStatus(Long id, Boolean actif) {
+        if (id == null || actif == null) {
+            throw new IllegalArgumentException("L'ID et le statut 'actif' ne peuvent pas être null");
+        }
+
+        Optional<CreneauDisponibilite> optional = creneauDisponibiliteRepository.findById(id);
+        if (optional.isEmpty()) {
+            throw new RuntimeException("Créneau avec l'ID " + id + " introuvable.");
+        }
+
+        CreneauDisponibilite creneauDispo = optional.get();
+        creneauDispo.setActif(actif);
+        CreneauDisponibilite saved = creneauDisponibiliteRepository.save(creneauDispo);
+
+        // 🔥 NOUVEAU : Synchroniser tous les créneaux futurs liés
+        synchroniserCreneauxFuturs(id, actif);
+
+        return saved;
+    }
+    /**
+     * Synchronise le statut de tous les créneaux futurs avec leur CreneauDisponibilite
+     */
+    private void synchroniserCreneauxFuturs(Long creneauDisponibiliteId, Boolean actif) {
+        LocalDate aujourdhui = LocalDate.now();
+
+        // Trouver tous les créneaux futurs liés à ce CreneauDisponibilite
+        List<Creneau> creneauxFuturs = creneauxRepository.findByCreneauDisponibiliteIdAndDateCreneauAfter(
+                creneauDisponibiliteId, aujourdhui);
+
+        if (!creneauxFuturs.isEmpty()) {
+            // Mettre à jour le statut pour tous les créneaux futurs
+            creneauxFuturs.forEach(creneau -> creneau.setActif(actif));
+            creneauxRepository.saveAll(creneauxFuturs);
+
+            System.out.println("Synchronisation : " + creneauxFuturs.size() +
+                    " créneaux futurs mis à jour avec le statut : " + actif);
+        }
+    }
 
     private void validateCreneauDisponibilite(CreneauDisponibilite creneauDisponibilite) {
         if (creneauDisponibilite == null) {
