@@ -73,7 +73,6 @@ public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneau
             creneau.setHeureFin(LocalTime.of(hour + 1, 0));
             creneau.setCapaciteMax(4);
             creneau.setActif(true);
-            creneau.setCreeParAdmin(false);
             creneaux.add(creneau);
 
             System.out.println("  Créneau créé : " + hour + "h00 - " + (hour + 1) + "h00");
