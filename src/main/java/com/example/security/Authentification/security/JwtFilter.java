@@ -25,28 +25,35 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-         @NotNull HttpServletRequest request,
-         @NotNull   HttpServletResponse response,
-         @NotNull   FilterChain filterChain
+            @NotNull HttpServletRequest request,
+            @NotNull HttpServletResponse response,
+            @NotNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // CORRECTION: Vérifier le chemin complet correctement
+        if (request.getServletPath().contains("/api/auth") ||
+                request.getServletPath().contains("/api/v1/auth")) {
+            filterChain.doFilter(request, response);
+            return; // AJOUT: return pour éviter le traitement JWT
+        }
 
-            if(request.getServletPath().contains("/api/v1/auth")){
-                filterChain.doFilter(request,response);
-            }
-            final String authHeader = request.getHeader("Authorization");
-            final String jwt;
-            final String userEmail;
-            if(authHeader == null || !authHeader.startsWith("Bearer ")){
-                filterChain.doFilter(request,response);
-                return;
-            }
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        final String userEmail;
 
-            jwt = authHeader.substring(7);
-            userEmail= jwtService.extractUsername(jwt);
-            if(userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        jwt = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(jwt);
+
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                if(jwtService.isTokenValid(jwt,userDetails)){
+
+                if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
@@ -57,8 +64,13 @@ public class JwtFilter extends OncePerRequestFilter {
                     );
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
+            } catch (Exception e) {
+                // AJOUT: Gestion des erreurs pour éviter les crashs
+                logger.error("Erreur lors de l'authentification JWT pour l'utilisateur: " + userEmail, e);
+                // Ne pas bloquer la requête, laisser passer sans authentification
             }
-        filterChain.doFilter(request,response);
+        }
 
+        filterChain.doFilter(request, response);
     }
 }
