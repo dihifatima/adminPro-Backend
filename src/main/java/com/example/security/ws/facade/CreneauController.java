@@ -12,8 +12,8 @@ import java.util.List;
 @RequestMapping("/creneaux")
 public class CreneauController {
 
-    private final  CreneauService creneauService;
-    private  final CreneauConverter creneauConverter;
+    private final CreneauService creneauService;
+    private final CreneauConverter creneauConverter;
 
     public CreneauController(CreneauService creneauService, CreneauConverter creneauConverter) {
         this.creneauService = creneauService;
@@ -31,13 +31,42 @@ public class CreneauController {
                     .body("Créneau non trouvé : " + e.getMessage());
         }
     }
+
+    /**
+     * Désactive/Active un créneau spécifique pour une date précise
+     */
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateCreneauStatus(
+            @PathVariable Long id,
+            @RequestParam("actif") Boolean actif) {
+        try {
+            Creneau updated = creneauService.updateCreneauStatus(id, actif);
+            CreneauDto dto = creneauConverter.map(updated);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Erreur : " + e.getMessage());
+        }
+    }
+
+    /**
+     * Récupère tous les créneaux disponibles pour prise de RDV
+     */
+    @GetMapping("/available")
+    public ResponseEntity<List<CreneauDto>> getAvailableCreneaux() {
+        List<Creneau> creneaux = creneauService.findAvailableCreneauxForBooking();
+        List<CreneauDto> dtos = creneauConverter.mapListEntities(creneaux);
+        return ResponseEntity.ok(dtos);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<CreneauDto>> getAll() {
         List<Creneau> entities = creneauService.findAll();
         List<CreneauDto> dtos = creneauConverter.mapListEntities(entities);
         return ResponseEntity.ok(dtos);
     }
-    /*// Vérifier disponibilité d’un créneau
+
+    /*// Vérifier disponibilité d'un créneau
     @GetMapping("/available-check/{id}")
     public ResponseEntity<Boolean> isAvailable(@PathVariable Long id) {
         try {
@@ -47,5 +76,4 @@ public class CreneauController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
         }
     }*/
-
 }

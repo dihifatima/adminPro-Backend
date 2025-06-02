@@ -27,8 +27,6 @@ public class CreneauDisponibilite {
     private Integer capaciteMax = 4;
     @Column(name = "actif")
     private Boolean actif = true;
-    @Column(name = "cree_par_admin")
-    private Boolean creeParAdmin = false;
     @OneToMany(mappedBy = "creneauDisponibilite", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Creneau> creneaux;
 }

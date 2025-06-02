@@ -25,7 +25,7 @@ public class DemandeServiceDto {
     private String statut = "en attent";
     // Champ pour le créneau
     private Long creneau;
-    private LocalDate dateCreneau;
+    private LocalDate dateRDV;
     private LocalTime heureDebut;
     private LocalTime heureFin;
 

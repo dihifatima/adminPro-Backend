@@ -1,6 +1,6 @@
 package com.example.security.service.impl;
 import com.example.security.dao.CreneauDisponibiliteRepository;
-import com.example.security.dao.GenerationCreneauxParDefautRepository;
+import com.example.security.dao.CreneauxRepository;
 import com.example.security.entity.Creneau;
 import com.example.security.entity.CreneauDisponibilite;
 import com.example.security.service.facade.GenerationCreneauxParDefautService;
@@ -17,9 +17,9 @@ import java.util.List;
 public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneauxParDefautService {
 
     private final CreneauDisponibiliteRepository creneauDisponibiliteRepository;
-    private final GenerationCreneauxParDefautRepository creneauRepository;
+    private final CreneauxRepository creneauRepository;
 
-    public GenerationCreneauxParDefautServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository, GenerationCreneauxParDefautRepository creneauRepository) {
+    public GenerationCreneauxParDefautServiceImpl(CreneauDisponibiliteRepository creneauDisponibiliteRepository, CreneauxRepository creneauRepository) {
         this.creneauDisponibiliteRepository = creneauDisponibiliteRepository;
         this.creneauRepository = creneauRepository;
     }
@@ -73,7 +73,6 @@ public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneau
             creneau.setHeureFin(LocalTime.of(hour + 1, 0));
             creneau.setCapaciteMax(4);
             creneau.setActif(true);
-            creneau.setCreeParAdmin(false);
             creneaux.add(creneau);
 
             System.out.println("  Créneau créé : " + hour + "h00 - " + (hour + 1) + "h00");
@@ -87,40 +86,40 @@ public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneau
         LocalDate aujourdhui = LocalDate.now();
 
         // 1. Supprimer les créneaux futurs non réservés
-        List<Creneau> creneauxASupprimer = creneauRepository.findByDateCreneauAfterAndCapaciteMaxGreaterThan(
-                aujourdhui, 0);
+        List<Creneau> creneauxASupprimer = creneauRepository.findByActifTrueAndCapaciteRestanteGreaterThan(0);
         creneauxASupprimer = creneauxASupprimer.stream()
-                .filter(c -> c.getCapaciteMax().equals(c.getCreneauDisponibilite().getCapaciteMax()))
+                .filter(c -> c.getCapaciteRestante().equals(c.getCreneauDisponibilite().getCapaciteMax()))
                 .toList();
         creneauRepository.deleteAll(creneauxASupprimer);
 
         System.out.println("Suppression de " + creneauxASupprimer.size() + " créneaux futurs non réservés");
 
-        // 2. ✅ AJOUT : Générer les créneaux pour les prochaines semaines
+        // 2.  AJOUT : Générer les créneaux pour les prochaines semaines
         generateCreneauxForPeriod(aujourdhui, aujourdhui.plusWeeks(4)); // 4 semaines à l'avance
     }
 
     /**
-     * ✅ NOUVELLE MÉTHODE : Génère les créneaux pour une période donnée
+     * NOUVELLE MÉTHODE : Génère les créneaux pour une période donnée
      */
+    // 6. Modifier GenerationCreneauxParDefautServiceImpl pour respecter le statut parent
+
     public void generateCreneauxForPeriod(LocalDate dateDebut, LocalDate dateFin) {
+        //  Récupérer SEULEMENT les créneaux disponibles ACTIFS
         List<CreneauDisponibilite> creneauxDisponibles = creneauDisponibiliteRepository.findByActifTrue();
         List<Creneau> nouveauxCreneaux = new ArrayList<>();
 
         System.out.println("=== GÉNÉRATION DES CRÉNEAUX ===");
         System.out.println("Période : " + dateDebut + " à " + dateFin);
-        System.out.println("Créneaux disponibles trouvés : " + creneauxDisponibles.size());
+        System.out.println("Créneaux disponibles ACTIFS trouvés : " + creneauxDisponibles.size());
 
         for (LocalDate date = dateDebut; !date.isAfter(dateFin); date = date.plusDays(1)) {
             DayOfWeek jourSemaine = date.getDayOfWeek();
 
-            // Trouver les créneaux disponibles pour ce jour
             List<CreneauDisponibilite> creneauxDuJour = creneauxDisponibles.stream()
                     .filter(cd -> cd.getJourSemaine().equals(jourSemaine))
                     .toList();
 
             for (CreneauDisponibilite creneauDispo : creneauxDuJour) {
-                // Vérifier si un créneau existe déjà pour cette date/heure
                 boolean creneauExiste = creneauRepository.existsByDateCreneauAndHeureDebutAndHeureFin(
                         date, creneauDispo.getHeureDebut(), creneauDispo.getHeureFin());
 
@@ -129,9 +128,9 @@ public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneau
                     nouveauCreneau.setDateCreneau(date);
                     nouveauCreneau.setHeureDebut(creneauDispo.getHeureDebut());
                     nouveauCreneau.setHeureFin(creneauDispo.getHeureFin());
-                    nouveauCreneau.setCapaciteMax(creneauDispo.getCapaciteMax());
-                    nouveauCreneau.setActif(true);
-                    nouveauCreneau.setCreneauDisponibilite(creneauDispo); // ✅ LIEN CRUCIAL
+                    nouveauCreneau.setCapaciteRestante(creneauDispo.getCapaciteMax());
+                    nouveauCreneau.setActif(creneauDispo.getActif()); //  Hérite du statut parent
+                    nouveauCreneau.setCreneauDisponibilite(creneauDispo);
 
                     nouveauxCreneaux.add(nouveauCreneau);
                 }
@@ -141,14 +140,11 @@ public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneau
         if (!nouveauxCreneaux.isEmpty()) {
             creneauRepository.saveAll(nouveauxCreneaux);
             System.out.println("Créneaux générés : " + nouveauxCreneaux.size());
-        } else {
-            System.out.println("Aucun nouveau créneau à générer");
         }
-        System.out.println("================================");
     }
 
     /**
-     * ✅ NOUVELLE MÉTHODE : Génère les créneaux pour les prochaines semaines
+     * NOUVELLE MÉTHODE : Génère les créneaux pour les prochaines semaines
      */
     public void generateFutureCreneaux() {
         LocalDate aujourdhui = LocalDate.now();

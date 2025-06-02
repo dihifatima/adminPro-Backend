@@ -6,14 +6,11 @@ import com.example.security.service.facade.GenerationCreneauxParDefautService;
 import com.example.security.service.facade.CreneauService;
 import com.example.security.ws.converter.CreneauConverter;
 import com.example.security.ws.converter.CreneauDisponibiliteConverter;
-import com.example.security.ws.dto.CreneauDisponibiliteDto;
 import com.example.security.ws.dto.CreneauDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 @RestController
 @RequestMapping("/creneaux-gestion")
 public class GenerationCreneauxParDefautController {
@@ -55,7 +52,7 @@ public class GenerationCreneauxParDefautController {
     public ResponseEntity<List<CreneauDto>> getCreneauxDisponibles() {
         try {
             // Récupérer tous les créneaux actifs depuis la base de données
-            List<Creneau> creneauxActifs = creneauService.findAllActiveCreneaux();
+            List<Creneau> creneauxActifs = creneauService.findAvailableCreneauxForBooking();
 
             // Convertir en DTO pour le frontend
             List<CreneauDto> creneauxDto = creneauConverter.mapListEntities(creneauxActifs);

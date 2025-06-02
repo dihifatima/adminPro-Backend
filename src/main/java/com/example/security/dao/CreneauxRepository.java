@@ -6,9 +6,12 @@ import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 
-public interface GenerationCreneauxParDefautRepository extends JpaRepository<Creneau, Long> {
+public interface CreneauxRepository extends JpaRepository<Creneau, Long> {
     boolean existsByDateCreneauAndHeureDebutAndHeureFin(LocalDate date, LocalTime heureDebut, LocalTime heureFin);
-    List<Creneau> findByDateCreneauAfterAndCapaciteMaxGreaterThan(LocalDate aujourdhui, int i);
+    List<Creneau> findByDateCreneauAfterAndCapaciteRestanteGreaterThan(LocalDate aujourdhui, int i);
     List<Creneau> findByDateCreneauBefore(LocalDate dateLimit);
-    Collection<Creneau> findByActifTrueAndCapaciteMaxGreaterThan(int i);
+
+    List<Creneau> findByCreneauDisponibiliteIdAndDateCreneauAfter(Long creneauDisponibiliteId, LocalDate date);
+
+    List<Creneau> findByActifTrueAndCapaciteRestanteGreaterThan(int i);
 }

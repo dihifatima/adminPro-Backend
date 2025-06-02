@@ -1,6 +1,6 @@
 package com.example.security.service.impl;
 
-import com.example.security.dao.GenerationCreneauxParDefautRepository;
+import com.example.security.dao.CreneauxRepository;
 import com.example.security.dao.CreneauDisponibiliteRepository;
 import com.example.security.entity.Creneau;
 import com.example.security.service.facade.CreneauService;
@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 public class CreneauServiceImpl implements CreneauService {
 
 
-    private final GenerationCreneauxParDefautRepository creneauRepository;
+    private final CreneauxRepository creneauRepository;
 
     private final CreneauDisponibiliteRepository creneauDisponibiliteRepository;
 
-    public CreneauServiceImpl(GenerationCreneauxParDefautRepository creneauRepository, CreneauDisponibiliteRepository creneauDisponibiliteRepository) {
+    public CreneauServiceImpl(CreneauxRepository creneauRepository, CreneauDisponibiliteRepository creneauDisponibiliteRepository) {
         this.creneauRepository = creneauRepository;
         this.creneauDisponibiliteRepository = creneauDisponibiliteRepository;
     }
@@ -40,7 +40,32 @@ public class CreneauServiceImpl implements CreneauService {
     @Override
     public boolean isCreneauAvailable(Long creneauId) {
         Creneau creneau = findById(creneauId);
-        return creneau.getActif() && creneau.getCapaciteMax() > 0;
+        return creneau.getActif() && creneau.getCapaciteRestante() > 0;
+    }
+
+    @Override
+    public Creneau updateCreneauStatus(Long creneauId, Boolean actif) {
+        Creneau creneau = findById(creneauId);
+        creneau.setActif(actif);
+        return creneauRepository.save(creneau);
+    }
+
+    @Override
+    public List<Creneau> findAvailableCreneauxForBooking() {
+        return creneauRepository.findByActifTrueAndCapaciteRestanteGreaterThan(0)
+                .stream()
+                .filter(creneau -> {
+                    // Vérifier que le créneau est dans le futur
+                    LocalDate today = LocalDate.now();
+                    return creneau.getDateCreneau().isAfter(today) ||
+                            creneau.getDateCreneau().equals(today);
+                })
+                .filter(creneau -> {
+                    // Vérifier que le CreneauDisponibilite parent est aussi actif
+                    return creneau.getCreneauDisponibilite() != null &&
+                            creneau.getCreneauDisponibilite().getActif();
+                })
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -51,21 +76,14 @@ public class CreneauServiceImpl implements CreneauService {
             throw new RuntimeException("Ce créneau n'est pas actif");
         }
 
-        if (creneau.getCapaciteMax() <= 0) {
+        if (creneau.getCapaciteRestante() <= 0) {
             throw new RuntimeException("Ce créneau n'a plus de places disponibles");
         }
 
-        creneau.setCapaciteMax(creneau.getCapaciteMax() - 1);
+        creneau.setCapaciteRestante(creneau.getCapaciteRestante() - 1);
         return creneauRepository.save(creneau);
     }
 
-    @Override
-    public List<Creneau> findAllActiveCreneaux() {
-        // Récupère les créneaux actifs avec une capacité disponible > 0
-        return creneauRepository.findByActifTrueAndCapaciteMaxGreaterThan(0)
-                .stream()
-                .filter(creneau -> creneau.getDateCreneau().isAfter(LocalDate.now().minusDays(1)))
-                .collect(Collectors.toList());
-    }
+
 
 }
