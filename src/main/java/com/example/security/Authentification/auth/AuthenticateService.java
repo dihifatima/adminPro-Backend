@@ -37,7 +37,7 @@ public class AuthenticateService {
     private final TokenRepository tokenRepository;
     private final AdminRepository adminRepository;
     private final EtudiantRepository etudiantRepository;
-    private final DemandeurVisaRepository porteVisaRepository;
+    private final DemandeurVisaRepository demandeurVisaRepository;
     private final EntrepreneurRepository entrepreneurRepository;
     private final ParticulierRepository particulierRepository;
     private final EmailService emailService;
@@ -127,14 +127,14 @@ public class AuthenticateService {
 
             particulierRepository.save(particulier);
             emailService.sendValidationEmail(particulier);
-        } else if (request.isPorteVisa()) {
+        } else if (request.isDemandeurVisa()) {
             if (userRepository.existsByEmail(request.getEmail())) {
                 throw new CustomException("Cet email est déjà utilisé");
             }
-            userRole = roleRepository.findByName("PORTEVISA")
-                    .orElseThrow(() -> new IllegalStateException("Le rôle PORTEVISA est introuvable ou non défini dans la base de données"));
+            userRole = roleRepository.findByName("DEMANDEURVISA")
+                    .orElseThrow(() -> new IllegalStateException("Le rôle DEMANDEURVISA est introuvable ou non défini dans la base de données"));
 
-            DemandeurVisa porteVisa = DemandeurVisa.builder()
+            DemandeurVisa demandeurVisa = DemandeurVisa.builder()
                     .email(request.getEmail())
                     .firstname(request.getFirstname())
                     .lastname(request.getLastname())
@@ -146,8 +146,8 @@ public class AuthenticateService {
                     .enabled(false)
                     .build();
 
-            porteVisaRepository.save(porteVisa);
-            emailService.sendValidationEmail(porteVisa);
+            demandeurVisaRepository.save(demandeurVisa);
+            emailService.sendValidationEmail(demandeurVisa);
         } else {
             throw new IllegalArgumentException("Invalid role selection");
         }
@@ -240,24 +240,6 @@ public class AuthenticateService {
         User newUser;
 
         switch (userType.toLowerCase()) {
-            case "admin":
-                roleName = "ADMIN";
-                Role adminRole = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role ADMIN not found"));
-
-                Admin admin = Admin.builder()
-                        .email(email)
-                        .firstname(firstname)
-                        .lastname(lastname)
-                        .enabled(true)
-                        .accountLocked(false)
-                        .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                        .roles(List.of(adminRole))
-                        .consentGDPR(true)
-                        .build();
-                newUser = adminRepository.saveAndFlush(admin); // MODIF: saveAndFlush au lieu de save
-                break;
-
             case "etudiant":
                 roleName = "ETUDIANT";
                 Role etudiantRole = roleRepository.findByName(roleName)
@@ -294,22 +276,22 @@ public class AuthenticateService {
                 newUser = entrepreneurRepository.saveAndFlush(entrepreneur); // MODIF: saveAndFlush au lieu de save
                 break;
 
-            case "portevisa":
-                roleName = "PORTEVISA";
-                Role porteVisaRole = roleRepository.findByName(roleName)
-                        .orElseThrow(() -> new RuntimeException("Role PORTEVISA not found"));
+            case "demandeurvisa":
+                roleName = "DEMANDEURVISA";
+                Role demandeurVisaRole = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new RuntimeException("Role DEMANDEURVISA not found"));
 
-                DemandeurVisa porteVisa = DemandeurVisa.builder()
+                DemandeurVisa demandeurVisa = DemandeurVisa.builder()
                         .email(email)
                         .firstname(firstname)
                         .lastname(lastname)
                         .enabled(true)
                         .accountLocked(false)
                         .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                        .roles(List.of(porteVisaRole))
+                        .roles(List.of(demandeurVisaRole))
                         .consentGDPR(true)
                         .build();
-                newUser = porteVisaRepository.saveAndFlush(porteVisa); // MODIF: saveAndFlush au lieu de save
+                newUser = demandeurVisaRepository.saveAndFlush(demandeurVisa); // MODIF: saveAndFlush au lieu de save
                 break;
 
             case "particulier":

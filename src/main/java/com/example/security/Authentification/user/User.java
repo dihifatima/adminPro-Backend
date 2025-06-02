@@ -50,7 +50,6 @@ public class User implements UserDetails, Principal {
     private String email;
     private String password;
     private String telephone;
-
     private boolean accountLocked;
     private boolean enabled;
     @CreatedDate

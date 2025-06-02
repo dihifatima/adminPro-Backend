@@ -13,7 +13,7 @@ public class RegistrationRequest {
     private boolean isEtudiant;
     private boolean isEntrepreneur;
     private boolean isParticulier;
-    private boolean isPorteVisa;
+    private boolean isDemandeurVisa;
 
     @AssertTrue(message = "C'est soit un admin, soit un étudiant ou un des autre .")
     private boolean isExactlyOneRole() {
@@ -22,7 +22,7 @@ public class RegistrationRequest {
         if (isEtudiant) count++;
         if (isEntrepreneur) count++;
         if (isParticulier) count++;
-        if (isPorteVisa) count++;
+        if (isDemandeurVisa) count++;
         return count == 1;
     }
     @NotEmpty(message = "Le prénom est obligatoire")

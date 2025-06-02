@@ -37,8 +37,8 @@ public class SecurityApplication {
 			if (roleRepository.findByName("ENTREPRENEUR").isEmpty()) {
 				roleRepository.save(Role.builder().name("ENTREPRENEUR").build());
 			}
-			if (roleRepository.findByName("PORTEVISA").isEmpty()) {
-				roleRepository.save(Role.builder().name("PORTEVISA").build());
+			if (roleRepository.findByName("DEMANDEURVISA").isEmpty()) {
+				roleRepository.save(Role.builder().name("DEMANDEURVISA").build());
 			}
 		};
 	}
@@ -55,8 +55,8 @@ public class SecurityApplication {
 			if (serviceOffertRepository.findByName("Assistance_Administrative").isEmpty()) {
 				serviceOffertRepository.save(ServiceOffert.builder().name("Assistance_Administrative").build());
 			}
-			if (serviceOffertRepository.findByName("Conseils_de_Gestion").isEmpty()) {
-				serviceOffertRepository.save(ServiceOffert.builder().name("Conseils_de_Gestion").build());
+			if (serviceOffertRepository.findByName("Conseils_en_Gestion").isEmpty()) {
+				serviceOffertRepository.save(ServiceOffert.builder().name("Conseils_en_Gestion").build());
 			}
 		};
 	}
