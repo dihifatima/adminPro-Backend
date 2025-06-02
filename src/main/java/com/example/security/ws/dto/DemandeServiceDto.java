@@ -17,7 +17,6 @@ public class DemandeServiceDto {
     private String ref;
     private Long userId;
     private String userNom;
-    private String telephone;
     private Long serviceOffertId;
     private String serviceOffertNom;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

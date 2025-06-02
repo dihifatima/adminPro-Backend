@@ -49,16 +49,6 @@ public class CreneauController {
         }
     }
 
-    /**
-     * Récupère tous les créneaux disponibles pour prise de RDV
-     */
-    @GetMapping("/available")
-    public ResponseEntity<List<CreneauDto>> getAvailableCreneaux() {
-        List<Creneau> creneaux = creneauService.findAvailableCreneauxForBooking();
-        List<CreneauDto> dtos = creneauConverter.mapListEntities(creneaux);
-        return ResponseEntity.ok(dtos);
-    }
-
     @GetMapping("/all")
     public ResponseEntity<List<CreneauDto>> getAll() {
         List<Creneau> entities = creneauService.findAll();
@@ -66,14 +56,4 @@ public class CreneauController {
         return ResponseEntity.ok(dtos);
     }
 
-    /*// Vérifier disponibilité d'un créneau
-    @GetMapping("/available-check/{id}")
-    public ResponseEntity<Boolean> isAvailable(@PathVariable Long id) {
-        try {
-            boolean available = creneauService.isCreneauAvailable(id);
-            return ResponseEntity.ok(available);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(false);
-        }
-    }*/
 }

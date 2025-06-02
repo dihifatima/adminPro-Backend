@@ -1,5 +1,4 @@
 package com.example.security.ws.facade;
-
 import com.example.security.Authentification.security.JwtService;
 import com.example.security.entity.Particulier;
 import com.example.security.service.facade.ParticulierService;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.util.List;
 

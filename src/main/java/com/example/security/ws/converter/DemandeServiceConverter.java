@@ -31,17 +31,13 @@ public class DemandeServiceConverter {
             dto.setServiceOffertId(entity.getServiceOffert().getId());
             dto.setServiceOffertNom(entity.getServiceOffert().getName());
         }
-
-        // Mapping créneau - C'est ici que le problème était !
         if (entity.getCreneau() != null) {
             dto.setCreneau(entity.getCreneau().getId());
 
-            // Information lisible sur le créneau (optionnel)
             Creneau creneau = entity.getCreneau();
-            String creneauInfo = String.format("%s de %s à %s",
-                    creneau.getDateCreneau(),
-                    creneau.getHeureDebut(),
-                    creneau.getHeureFin());
+            dto.setDateRDV(creneau.getDateCreneau());
+            dto.setHeureDebut(creneau.getHeureDebut());
+            dto.setHeureFin(creneau.getHeureFin());
         }
 
         return dto;
