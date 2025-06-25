@@ -73,6 +73,8 @@ public class User implements UserDetails, Principal {
 
     @OneToMany(mappedBy = "user")
     private List<DemandeService> demandes;
+    // AJOUT : Relation avec EtatUtilisateur
+    
 
 
     @Override

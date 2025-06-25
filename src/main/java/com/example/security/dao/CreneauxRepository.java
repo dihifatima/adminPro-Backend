@@ -3,7 +3,6 @@ import com.example.security.entity.Creneau;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Collection;
 import java.util.List;
 
 public interface CreneauxRepository extends JpaRepository<Creneau, Long> {
@@ -14,4 +13,6 @@ public interface CreneauxRepository extends JpaRepository<Creneau, Long> {
     List<Creneau> findByCreneauDisponibiliteIdAndDateCreneauAfter(Long creneauDisponibiliteId, LocalDate date);
 
     List<Creneau> findByActifTrueAndCapaciteRestanteGreaterThan(int i);
+
+    List<Creneau> findByDateCreneauAndActifTrue(LocalDate date);
 }

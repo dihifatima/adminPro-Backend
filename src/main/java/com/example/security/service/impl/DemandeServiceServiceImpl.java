@@ -142,13 +142,13 @@ public class DemandeServiceServiceImpl implements DemandeServiceService {
             return serviceOffertRepository.findById(1L)
                     .orElseThrow(() -> new RuntimeException("Service pour étudiant introuvable"));
         } else if (user instanceof Entrepreneur) {
-            return serviceOffertRepository.findById(2L)
+            return serviceOffertRepository.findById(4L)
                     .orElseThrow(() -> new RuntimeException("Service pour entrepreneur introuvable"));
         } else if (user instanceof DemandeurVisa) {
-            return serviceOffertRepository.findById(3L)
+            return serviceOffertRepository.findById(2L)
                     .orElseThrow(() -> new RuntimeException("Service pour demandeur de visa introuvable"));
         } else if (user instanceof Particulier) {
-            return serviceOffertRepository.findById(4L)
+            return serviceOffertRepository.findById(3L)
                     .orElseThrow(() -> new RuntimeException("Service pour particulier introuvable"));
         } else {
             throw new RuntimeException("Type de client non supporté");

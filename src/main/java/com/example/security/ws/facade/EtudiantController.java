@@ -108,4 +108,12 @@ public class EtudiantController {
         EtudiantDto dto = converter.map(etudiant);
         return ResponseEntity.ok(dto);
     }
+    @GetMapping("email/{email}/clientId")
+    public ResponseEntity<Long> findClientIdByEmail(@PathVariable String email) {
+        Etudiant etudiant = service.findByEmail(email);
+        if (etudiant == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(etudiant.getId());
+    }
 }

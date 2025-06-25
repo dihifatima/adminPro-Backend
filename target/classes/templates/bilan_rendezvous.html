@@ -10,6 +10,26 @@
             color: #333333;
         }
 
+        /* En-tête entreprise */
+        .company-header {
+            text-align: center;
+            border-bottom: 2px solid #cccccc;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 120px;
+            height: 80px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .company-info {
+            font-size: 14px;
+            color: #666666;
+        }
+
         h1 {
             text-align: center;
             font-size: 24px;
@@ -30,11 +50,16 @@
             padding-bottom: 5px;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px 30px;
+        /* Tableau pour les informations personnelles (côte à côte) */
+        .info-table {
+            width: 100%;
             margin-top: 15px;
+        }
+
+        .info-table td {
+            padding: 8px;
+            vertical-align: top;
+            width: 50%;
         }
 
         .info-label {
@@ -43,6 +68,21 @@
 
         .info-item {
             margin-bottom: 8px;
+        }
+
+        /* Style pour les détails du rendez-vous (liste verticale) */
+        .rdv-details {
+            margin-top: 15px;
+        }
+
+        .rdv-details .info-item {
+            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px dotted #e0e0e0;
+        }
+
+        .rdv-details .info-item:last-child {
+            border-bottom: none;
         }
 
         .footer {
@@ -55,28 +95,48 @@
 </head>
 <body>
 
+<!-- En-tête entreprise -->
+<div class="company-header">
+    <img src="file:///C:/Users/Admin/Desktop/adminPro-Backend/src/main/resources/static/images/logoAdminpro.png" alt="Adminpro Advisors Solutions" class="logo" />
+    <div class="company-info">
+        <strong>Adminpro Advisors Solutions</strong><br/>
+        N°01 imm 07 tranche 15 les portes de Marrakech<br/>
+        Tél: +212 5 24 39 27 70 | Email: ad.advisorssolutions@gmail.com
+    </div>
+</div>
+
 <h1>BILAN DE RENDEZ-VOUS</h1>
 <p class="subtitle">Document généré le <span th:text="${generationDate}">Date</span></p>
 <p class="subtitle">Référence du rendez-vous : <span th:text="${ref}">Référence</span></p>
 
 <div class="section">
     <h2 class="section-title">Informations personnelles</h2>
-    <div class="info-grid">
-        <div class="info-item">
-            <span class="info-label">Nom :</span> <span th:text="${userNom}">Nom Utilisateur</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Email :</span> <span th:text="${email}">email@example.com</span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Téléphone :</span> <span th:text="${telephone}">Téléphone</span>
-        </div>
-    </div>
+    <table class="info-table">
+        <tr>
+            <td>
+                <div class="info-item">
+                    <span class="info-label">Nom :</span> <span th:text="${userNom}">Nom Utilisateur</span>
+                </div>
+            </td>
+            <td>
+                <div class="info-item">
+                    <span class="info-label">Email :</span> <span th:text="${email}">email@example.com</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="info-item">
+                    <span class="info-label">Téléphone :</span> <span th:text="${telephone}">Téléphone</span>
+                </div>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <div class="section">
     <h2 class="section-title">Détails du rendez-vous</h2>
-    <div class="info-grid">
+    <div class="rdv-details">
         <div class="info-item">
             <span class="info-label">Date Soumission de demande :</span> <span th:text="${date}">Date soumission</span>
         </div>
@@ -84,7 +144,7 @@
             <span class="info-label">Date de rendez-vous :</span> <span th:text="${creneau}">Date RDV</span>
         </div>
         <div class="info-item">
-            <span class="info-label">Service demandée :</span> <span th:text="${serviceOffertNom}">Service</span>
+            <span class="info-label">Service demandé :</span> <span th:text="${serviceOffertNom}">Service</span>
         </div>
     </div>
 </div>
