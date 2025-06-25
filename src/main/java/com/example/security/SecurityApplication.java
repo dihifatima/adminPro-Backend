@@ -11,11 +11,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @SpringBootApplication
 @EnableJpaAuditing
 @EnableAsync
 @EnableScheduling
+@EnableWebSecurity
 public class SecurityApplication {
 
 	public static void main(String[] args) {
