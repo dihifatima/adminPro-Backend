@@ -32,9 +32,7 @@ public class CreneauController {
         }
     }
 
-    /**
-     * Désactive/Active un créneau spécifique pour une date précise
-     */
+
     @PutMapping("/{id}/status")
     public ResponseEntity<?> updateCreneauStatus(
             @PathVariable Long id,

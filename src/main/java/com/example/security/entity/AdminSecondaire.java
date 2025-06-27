@@ -14,8 +14,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
-@DiscriminatorValue("admin")// si tu utilises l'héritage
-
-public class Admin extends User {
-     private  String ref;
+@DiscriminatorValue("AdminSecondaire")// si tu utilises l'héritage
+public class AdminSecondaire  extends User {
+    private  String  ref;
 }
+

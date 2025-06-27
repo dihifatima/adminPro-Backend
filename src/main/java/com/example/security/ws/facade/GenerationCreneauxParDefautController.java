@@ -63,51 +63,6 @@ public class GenerationCreneauxParDefautController {
         }
     }
 
-       /* @PostMapping("/initialize-default")
-    public ResponseEntity<?> initializeDefaultCreneaux() {
-        try {
-            creneauGenerationService.initializeDefaultCreneauxDisponibilite();
-            return ResponseEntity.ok("Créneaux par défaut initialisés avec succès");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors de l'initialisation : " + e.getMessage());
-        }
-         @GetMapping("/view-configuration")
-    public ResponseEntity<Map<String, Object>> viewCurrentConfiguration() {
-        try {
-            List<CreneauDisponibilite> allCreneaux = creneauDisponibiliteService.findAll();
-            List<CreneauDisponibilite> defaultCreneaux = allCreneaux.stream()
-                    .filter(c -> !c.getCreeParAdmin())
-                    .toList();
-            List<CreneauDisponibilite> customCreneaux = allCreneaux.stream()
-                    .filter(CreneauDisponibilite::getCreeParAdmin)
-                    .toList();
 
-            Map<String, Object> config = new HashMap<>();
-            config.put("total_creneaux", allCreneaux.size());
-            config.put("default_creneaux", defaultCreneaux.size());
-            config.put("custom_creneaux", customCreneaux.size());
-            config.put("creneaux_actifs", allCreneaux.stream().filter(CreneauDisponibilite::getActif).count());
-
-            config.put("default_creneaux_list", creneauDisponibiliteConverter.mapListEntities(defaultCreneaux));
-            config.put("custom_creneaux_list", creneauDisponibiliteConverter.mapListEntities(customCreneaux));
-
-            return ResponseEntity.ok(config);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    @GetMapping("/all")
-    public ResponseEntity<?> findAll() {
-        try {
-            List<CreneauDisponibilite> creneaux = creneauDisponibiliteService.findAll();
-            List<CreneauDisponibiliteDto> dtos = creneauDisponibiliteConverter.mapListEntities(creneaux);
-            return ResponseEntity.ok(dtos);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erreur lors de la récupération des créneaux : " + e.getMessage());
-        }
-    }
-    }*/
 
 }

@@ -22,9 +22,9 @@ public class CreneauCleanupScheduler {
     }
 
     /**
-     * 🔥 NOUVELLE TÂCHE : Nettoyage + Génération automatique tous les jours à 1h du matin
+     * 🔥 NOUVELLE TÂCHE : Nettoyage + Génération automatique tous les jours à 00h du matin
      */
-    @Scheduled(cron = "0 0 1 * * *")
+    @Scheduled(cron = "0 0 0 * * *")  // à minuit exactement
     public void dailyCreneauxMaintenance() {
         System.out.println("=== MAINTENANCE QUOTIDIENNE DES CRÉNEAUX (1h du matin) ===");
 
@@ -40,7 +40,7 @@ public class CreneauCleanupScheduler {
     /**
      * 🔥 NOUVELLE TÂCHE : Génération proactive à 6h du matin (heures de pointe)
      */
-    @Scheduled(cron = "0 0 6 * * *")
+    @Scheduled(cron = "0 0 6 * * *") // à 6h du matin chaque jour
     public void morningCreneauxGeneration() {
         System.out.println("=== GÉNÉRATION MATINALE DES CRÉNEAUX (6h du matin) ===");
         generationService.generateFutureCreneaux();
@@ -60,9 +60,9 @@ public class CreneauCleanupScheduler {
             // 2. Générer les créneaux futurs
             generationService.generateFutureCreneaux();
 
-            System.out.println("✅ Maintenance au démarrage terminée avec succès");
+            System.out.println(" Maintenance au démarrage terminée avec succès");
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la maintenance au démarrage : " + e.getMessage());
+            System.err.println("Erreur lors de la maintenance au démarrage : " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -80,9 +80,9 @@ public class CreneauCleanupScheduler {
             // Puis générer
             generationService.generateFutureCreneaux();
 
-            System.out.println("✅ Maintenance immédiate terminée");
+            System.out.println(" Maintenance immédiate terminée");
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de la maintenance immédiate : " + e.getMessage());
+            System.err.println(" Erreur lors de la maintenance immédiate : " + e.getMessage());
         }
     }
 

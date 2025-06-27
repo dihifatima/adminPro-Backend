@@ -124,11 +124,6 @@ public class CreneauServiceImpl implements CreneauService {
         return creneauRepository.save(creneau);
     }
 
-    /**
-     * Nettoie automatiquement les créneaux passés
-     * Option 1: Les désactive (recommandé pour garder l'historique)
-     * Option 2: Les supprime complètement
-     */
     @Override
     public void cleanupPassedCreneaux() {
         LocalDate today = LocalDate.now();
@@ -164,17 +159,13 @@ public class CreneauServiceImpl implements CreneauService {
             // OPTION 2: Supprimer complètement (décommenter si préféré)
             // creneauRepository.deleteAll(creneauxToCleanup);
 
-            System.out.println("✅ Nettoyage effectué : " + creneauxToCleanup.size() +
+            System.out.println(" Nettoyage effectué : " + creneauxToCleanup.size() +
                     " créneaux passés désactivés");
         } else {
-            System.out.println("✅ Aucun créneau passé à nettoyer");
+            System.out.println("Aucun créneau passé à nettoyer");
         }
     }
 
-    /**
-     * Nettoie les créneaux vraiment anciens (plus de X jours)
-     * Utile pour éviter l'accumulation de données
-     */
     @Override
     public void cleanupOldCreneaux(int daysOld) {
         LocalDate cutoffDate = LocalDate.now().minusDays(daysOld);
@@ -187,76 +178,5 @@ public class CreneauServiceImpl implements CreneauService {
             System.out.println("🗑️ Suppression de " + oldCreneaux.size() +
                     " créneaux de plus de " + daysOld + " jours");
         }
-    }
-
-    /**
-     * Réactive un créneau (utile pour les tests ou corrections)
-     */
-    @Override
-    public Creneau reactiverCreneau(Long creneauId) {
-        Creneau creneau = findById(creneauId);
-
-        // Vérifier que le créneau peut être réactivé (pas dans le passé)
-        LocalDate today = LocalDate.now();
-        LocalDateTime now = LocalDateTime.now();
-
-        if (creneau.getDateCreneau().isBefore(today)) {
-            throw new RuntimeException("Impossible de réactiver un créneau passé");
-        } else if (creneau.getDateCreneau().equals(today)) {
-            LocalDateTime creneauDateTime = LocalDateTime.of(
-                    creneau.getDateCreneau(),
-                    creneau.getHeureDebut()
-            );
-            if (creneauDateTime.isBefore(now)) {
-                throw new RuntimeException("Impossible de réactiver un créneau dont l'heure est passée");
-            }
-        }
-
-        creneau.setActif(true);
-        return creneauRepository.save(creneau);
-    }
-
-    /**
-     * Compte les créneaux disponibles pour une date donnée
-     */
-    @Override
-    public long countAvailableCreneauxForDate(LocalDate date) {
-        return creneauRepository.findByDateCreneauAndActifTrue(date)
-                .stream()
-                .filter(creneau -> creneau.getCapaciteRestante() > 0)
-                .filter(creneau -> creneau.getCreneauDisponibilite() != null &&
-                        creneau.getCreneauDisponibilite().getActif())
-                .count();
-    }
-
-    /**
-     * Récupère tous les créneaux disponibles pour une date donnée
-     */
-    @Override
-    public List<Creneau> findAvailableCreneauxForDate(LocalDate date) {
-        // Vérifier que la date n'est pas dans le passé
-        LocalDate today = LocalDate.now();
-        LocalDateTime now = LocalDateTime.now();
-
-        if (date.isBefore(today)) {
-            return List.of(); // Retourner une liste vide pour les dates passées
-        }
-
-        return creneauRepository.findByDateCreneauAndActifTrue(date)
-                .stream()
-                .filter(creneau -> creneau.getCapaciteRestante() > 0)
-                .filter(creneau -> {
-                    // Si c'est aujourd'hui, vérifier l'heure
-                    if (date.equals(today)) {
-                        LocalDateTime creneauDateTime = LocalDateTime.of(
-                                date, creneau.getHeureDebut()
-                        );
-                        return creneauDateTime.isAfter(now);
-                    }
-                    return true;
-                })
-                .filter(creneau -> creneau.getCreneauDisponibilite() != null &&
-                        creneau.getCreneauDisponibilite().getActif())
-                .collect(Collectors.toList());
     }
 }

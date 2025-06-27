@@ -25,8 +25,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +36,7 @@ public class AuthenticateService {
     private final TokenRepository tokenRepository;
     private final AdminRepository adminRepository;
     private final EtudiantRepository etudiantRepository;
+    private final AdminSecondairRepository adminSecondairRepository;
     private final DemandeurVisaRepository demandeurVisaRepository;
     private final EntrepreneurRepository entrepreneurRepository;
     private final ParticulierRepository particulierRepository;
@@ -64,7 +64,28 @@ public class AuthenticateService {
 
             adminRepository.save(admin);
             emailService.sendValidationEmail(admin);
-        } else if (request.isEtudiant()) {
+        } else if (request.isAdminSecondaire()) {
+            if (userRepository.existsByEmail(request.getEmail())) {
+                throw new CustomException("Cet email est déjà utilisé");
+            }
+            userRole = roleRepository.findByName("ADMINSECONDAIRE")
+                    .orElseThrow(() -> new IllegalStateException("Le rôle ADMINSECONDAIRE est introuvable ou non défini dans la base de données"));
+
+            AdminSecondaire adminSecondaire = (AdminSecondaire) AdminSecondaire.builder()
+                    .email(request.getEmail())
+                    .firstname(request.getFirstname())
+                    .lastname(request.getLastname())
+                    .telephone(request.getTelephone())
+                    .roles(List.of(userRole))
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .accountLocked(false)
+                    .consentGDPR(request.isConsentGDPR())
+                    .enabled(false)
+                    .build();
+
+            adminSecondairRepository.save(adminSecondaire);
+            emailService.sendValidationEmail(adminSecondaire);
+        }else if (request.isEtudiant()) {
             if (userRepository.existsByEmail(request.getEmail())) {
                 throw new CustomException("Cet email est déjà utilisé");
             }

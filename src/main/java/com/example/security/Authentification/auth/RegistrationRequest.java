@@ -10,10 +10,12 @@ import lombok.Setter;
 public class RegistrationRequest {
 
     private boolean isAdmin;
+    private boolean isAdminSecondaire;
     private boolean isEtudiant;
     private boolean isEntrepreneur;
     private boolean isParticulier;
     private boolean isDemandeurVisa;
+
 
     @AssertTrue(message = "C'est soit un admin, soit un étudiant ou un des autre .")
     private boolean isExactlyOneRole() {
@@ -23,6 +25,7 @@ public class RegistrationRequest {
         if (isEntrepreneur) count++;
         if (isParticulier) count++;
         if (isDemandeurVisa) count++;
+        if (isAdminSecondaire) count++;
         return count == 1;
     }
     @NotEmpty(message = "Le prénom est obligatoire")
