@@ -1,5 +1,6 @@
 package com.example.security.dao;
 import com.example.security.entity.Creneau;
+import com.example.security.entity.CreneauDisponibilite;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,4 +16,6 @@ public interface CreneauxRepository extends JpaRepository<Creneau, Long> {
     List<Creneau> findByActifTrueAndCapaciteRestanteGreaterThan(int i);
 
     List<Creneau> findByDateCreneauAndActifTrue(LocalDate date);
+
+    List<Creneau> findByCreneauDisponibilite(CreneauDisponibilite dispo);
 }

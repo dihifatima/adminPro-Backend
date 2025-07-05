@@ -26,9 +26,35 @@ public class GenerationCreneauxParDefautServiceImpl implements GenerationCreneau
 
     @Override
     public void initializeDefaultCreneauxDisponibilite() {
-        creneauDisponibiliteRepository.deleteAll();
+        // Étape 1 : Récupérer toutes les disponibilités actives
+        List<CreneauDisponibilite> disponibilites = creneauDisponibiliteRepository.findByActifTrue();
+        List<CreneauDisponibilite> aSupprimer = new ArrayList<>();
+
+        // Étape 2 : Vérifier les créneaux associés pour chaque disponibilité
+        for (CreneauDisponibilite dispo : disponibilites) {
+            List<Creneau> creneaux = creneauRepository.findByCreneauDisponibilite(dispo);
+
+            boolean allUnused = creneaux.stream()
+                    .allMatch(c -> c.getCapaciteRestante().equals(dispo.getCapaciteMax()));
+
+            // Si aucun créneau associé OU tous les créneaux sont inutilisés (pleine capacité)
+            if (creneaux.isEmpty() || allUnused) {
+                aSupprimer.add(dispo);
+            }
+        }
+
+        // Étape 3 : Supprimer seulement les disponibilités sûres
+        if (!aSupprimer.isEmpty()) {
+            creneauDisponibiliteRepository.deleteAll(aSupprimer);
+            System.out.println("Créneaux disponibilités supprimés : " + aSupprimer.size());
+        } else {
+            System.out.println("Aucune disponibilité supprimée (elles sont toutes utilisées ou réservées partiellement).");
+        }
+
+        // Étape 4 : Créer les nouveaux créneaux de disponibilité
         createDefaultCreneauxDisponibilite();
     }
+
 
     private void createDefaultCreneauxDisponibilite() {
         List<CreneauDisponibilite> defaultCreneaux = new ArrayList<>();
